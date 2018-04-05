@@ -295,4 +295,10 @@ static inline void tick_nohz_task_switch(void)
 		__tick_nohz_task_switch();
 }
 
+# ifdef CONFIG_CPU_IDLE_GOV_MENU
+extern void menu_hrtimer_cancel(void);
+# else
+static inline void menu_hrtimer_cancel(void) {}
+# endif /* CONFIG_CPU_IDLE_GOV_MENU */
+
 #endif
