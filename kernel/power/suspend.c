@@ -31,6 +31,8 @@
 #include <linux/compiler.h>
 #include <linux/moduleparam.h>
 #include <linux/wakeup_reason.h>
+#include <linux/irqchip/arm-gic-v3.h>
+#include <linux/sec_bsp.h>
 
 #include "power.h"
 
@@ -286,8 +288,25 @@ static int suspend_prepare(suspend_state_t state)
 	error = __pm_notifier_call_chain(PM_SUSPEND_PREPARE, -1, &nr_calls);
 	if (error) {
 		nr_calls--;
+		suspend_stats_ex_save_failed(FAILED_NOTIFIER_CALL, NULL);
 		goto Finish;
 	}
+
+	sec_suspend_resume_add("Syncing FS+");
+#ifndef CONFIG_SUSPEND_SKIP_SYNC
+	trace_suspend_resume(TPS("sync_filesystems"), 0, true);
+	pr_info("PM: Syncing filesystems ... ");
+	if (intr_sync(NULL)) {
+		printk("canceled.\n");
+		trace_suspend_resume(TPS("sync_filesystems"), 0, false);
+		suspend_stats_ex_save_failed(FAILED_FS_SYNC, NULL);
+		error = -EBUSY;
+		goto Finish;
+	}
+	pr_cont("done.\n");
+	trace_suspend_resume(TPS("sync_filesystems"), 0, false);
+#endif
+	sec_suspend_resume_add("Syncing FS-");
 
 	trace_suspend_resume(TPS("freeze_processes"), 0, true);
 	error = suspend_freeze_processes();
@@ -328,8 +347,10 @@ static int suspend_enter(suspend_state_t state, bool *wakeup)
 	int error, last_dev;
 
 	error = platform_suspend_prepare(state);
-	if (error)
+	if (error) {
+		suspend_stats_ex_save_failed(FAILED_PLATFORM_PREPARE, NULL);
 		goto Platform_finish;
+	}
 
 	error = dpm_suspend_late(PMSG_SUSPEND);
 	if (error) {
@@ -341,8 +362,10 @@ static int suspend_enter(suspend_state_t state, bool *wakeup)
 		goto Platform_finish;
 	}
 	error = platform_suspend_prepare_late(state);
-	if (error)
+	if (error) {
+		suspend_stats_ex_save_failed(FAILED_PLATFORM_PREPARE_LATE, NULL);
 		goto Devices_early_resume;
+	}
 
 	error = dpm_suspend_noirq(PMSG_SUSPEND);
 	if (error) {
@@ -354,8 +377,10 @@ static int suspend_enter(suspend_state_t state, bool *wakeup)
 		goto Platform_early_resume;
 	}
 	error = platform_suspend_prepare_noirq(state);
-	if (error)
+	if (error) {
+		suspend_stats_ex_save_failed(FAILED_PLATFORM_PREPARE_NOIRQ, NULL);
 		goto Platform_wake;
+	}
 
 	if (suspend_test(TEST_PLATFORM))
 		goto Platform_wake;
@@ -376,6 +401,7 @@ static int suspend_enter(suspend_state_t state, bool *wakeup)
 	error = disable_nonboot_cpus();
 	if (error || suspend_test(TEST_CPUS)) {
 		log_suspend_abort_reason("Disabling non-boot cpus failed");
+		suspend_stats_ex_save_failed(FAILED_DISABLE_NONBOOT_CPUS, NULL);
 		goto Enable_cpus;
 	}
 
@@ -391,6 +417,8 @@ static int suspend_enter(suspend_state_t state, bool *wakeup)
 			error = suspend_ops->enter(state);
 			trace_suspend_resume(TPS("machine_suspend"),
 				state, false);
+			if (error)
+				suspend_stats_ex_save_failed(FAILED_ENTER, NULL);
 			events_check_enabled = false;
 		} else if (*wakeup) {
 			pm_get_active_wakeup_sources(suspend_abort,
@@ -399,7 +427,12 @@ static int suspend_enter(suspend_state_t state, bool *wakeup)
 			error = -EBUSY;
 		}
 		syscore_resume();
-	}
+		if (msm_show_resume_irq_mask) {
+			gic_show_pending_irqs();
+			pr_err("ICC_HPPIR1_EL1: %d\n", get_gic_highpri_irq());
+		}
+	} else
+		suspend_stats_ex_save_failed(FAILED_SYSCORE_SUSPEND, NULL);
 
 	arch_suspend_enable_irqs();
 	BUG_ON(irqs_disabled());
@@ -435,8 +468,10 @@ int suspend_devices_and_enter(suspend_state_t state)
 		return -ENOSYS;
 
 	error = platform_suspend_begin(state);
-	if (error)
+	if (error) {
+		suspend_stats_ex_save_failed(FAILED_PLATFORM_BEGIN, NULL);
 		goto Close;
+	}
 
 	suspend_console();
 	suspend_test_start();
@@ -512,14 +547,6 @@ static int enter_state(suspend_state_t state)
 
 	if (state == PM_SUSPEND_FREEZE)
 		freeze_begin();
-
-#ifndef CONFIG_SUSPEND_SKIP_SYNC
-	trace_suspend_resume(TPS("sync_filesystems"), 0, true);
-	pr_info("PM: Syncing filesystems ... ");
-	sys_sync();
-	pr_cont("done.\n");
-	trace_suspend_resume(TPS("sync_filesystems"), 0, false);
-#endif
 
 	pr_debug("PM: Preparing system for sleep (%s)\n", pm_states[state]);
 	pm_suspend_clear_flags();

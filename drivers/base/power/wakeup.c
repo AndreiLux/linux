@@ -17,8 +17,13 @@
 #include <linux/pm_wakeirq.h>
 #include <linux/types.h>
 #include <trace/events/power.h>
+#include <linux/irq.h>
+#include <linux/irqdesc.h>
 
 #include "power.h"
+#ifdef CONFIG_SEC_PM
+#include <linux/wakeup_reason.h>
+#endif
 
 /*
  * If set, the suspend/hibernate code will abort transitions to a sleep state
@@ -810,8 +815,9 @@ void pm_get_active_wakeup_sources(char *pending_wakeup_source, size_t max)
 	struct wakeup_source *ws, *last_active_ws = NULL;
 	int len = 0;
 	bool active = false;
+	int srcuidx;
 
-	rcu_read_lock();
+	srcuidx = srcu_read_lock(&wakeup_srcu);
 	list_for_each_entry_rcu(ws, &wakeup_sources, entry) {
 		if (ws->active && len < max) {
 			if (!active)
@@ -820,6 +826,7 @@ void pm_get_active_wakeup_sources(char *pending_wakeup_source, size_t max)
 			len += scnprintf(pending_wakeup_source + len, max - len,
 				"%s ", ws->name);
 			active = true;
+			suspend_stats_ex_save_failed(FAILED_WAKELOCK, ws);
 		} else if (!active &&
 			   (!last_active_ws ||
 			    ktime_to_ns(ws->last_time) >
@@ -831,8 +838,9 @@ void pm_get_active_wakeup_sources(char *pending_wakeup_source, size_t max)
 		scnprintf(pending_wakeup_source, max,
 				"Last active Wakeup Source: %s",
 				last_active_ws->name);
+		suspend_stats_ex_save_failed(FAILED_WAKELOCK, last_active_ws);
 	}
-	rcu_read_unlock();
+	srcu_read_unlock(&wakeup_srcu, srcuidx);
 }
 EXPORT_SYMBOL_GPL(pm_get_active_wakeup_sources);
 
@@ -908,7 +916,24 @@ void pm_wakeup_clear(void)
 
 void pm_system_irq_wakeup(unsigned int irq_number)
 {
+	struct irq_desc *desc;
+	const char *name = "null";
+
 	if (pm_wakeup_irq == 0) {
+		if (msm_show_resume_irq_mask) {
+			desc = irq_to_desc(irq_number);
+			if (desc == NULL)
+				name = "stray irq";
+			else if (desc->action && desc->action->name)
+				name = desc->action->name;
+
+#ifdef CONFIG_SEC_PM
+			log_wakeup_reason(irq_number);
+#else
+			pr_warn("%s: %d triggered %s\n", __func__,
+					irq_number, name);
+#endif
+		}
 		pm_wakeup_irq = irq_number;
 		pm_system_wakeup();
 	}

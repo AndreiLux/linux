@@ -23,10 +23,21 @@ targets := Image Image.gz
 DTB_NAMES := $(subst $\",,$(CONFIG_BUILD_ARM64_APPENDED_DTB_IMAGE_NAMES))
 ifneq ($(DTB_NAMES),)
 DTB_LIST := $(addsuffix .dtb,$(DTB_NAMES))
-else
-DTB_LIST := $(dtb-y)
-endif
 DTB_OBJS := $(addprefix $(obj)/dts/,$(DTB_LIST))
+else
+DTB_OBJS := $(shell find $(obj)/dts/ -name \*.dtb)
+endif
+
+# Add RTIC DTB to the DTB list if RTIC MPGen is enabled
+ifdef RTIC_MPGEN
+DTB_OBJS += rtic_mp.dtb
+endif
+
+rtic_mp.dtb: vmlinux FORCE
+	$(RTIC_MPGEN) --objcopy="${OBJCOPY}" --objdump="${OBJDUMP}" \
+	--binpath="" --vmlinux="vmlinux" --config=${KCONFIG_CONFIG} \
+	--cc="${CC}" --dts=rtic_mp.dts && \
+	$(DTC) -O dtb -o rtic_mp.dtb -b 0 $(DTC_FLAGS) rtic_mp.dts
 
 $(obj)/Image: vmlinux FORCE
 	$(call if_changed,objcopy)

@@ -152,6 +152,12 @@ static int sync_file_set_fence(struct sync_file *sync_file,
 			return -ENOMEM;
 
 		sync_file->fence = &array->base;
+
+		/*
+		 * Register for callbacks so that we know when each fence
+		 * in the array is signaled
+		 */
+		fence_enable_sw_signaling(sync_file->fence);
 	}
 
 	return 0;
@@ -279,7 +285,7 @@ static void sync_file_free(struct kref *kref)
 	struct sync_file *sync_file = container_of(kref, struct sync_file,
 						     kref);
 
-	if (test_bit(POLL_ENABLED, &sync_file->fence->flags))
+	if (test_bit(POLL_ENABLED, &sync_file->flags))
 		fence_remove_callback(sync_file->fence, &sync_file->cb);
 	fence_put(sync_file->fence);
 	kfree(sync_file);
@@ -299,7 +305,7 @@ static unsigned int sync_file_poll(struct file *file, poll_table *wait)
 
 	poll_wait(file, &sync_file->wq, wait);
 
-	if (!test_and_set_bit(POLL_ENABLED, &sync_file->fence->flags)) {
+	if (!test_and_set_bit(POLL_ENABLED, &sync_file->flags)) {
 		if (fence_add_callback(sync_file->fence, &sync_file->cb,
 					   fence_check_cb_func) < 0)
 			wake_up_all(&sync_file->wq);

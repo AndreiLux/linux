@@ -128,6 +128,54 @@ int fs_overflowgid = DEFAULT_FS_OVERFLOWUID;
 EXPORT_SYMBOL(fs_overflowuid);
 EXPORT_SYMBOL(fs_overflowgid);
 
+#if defined CONFIG_SEC_RESTRICT_SETUID
+int sec_check_execpath(struct mm_struct *mm, char *denypath);
+#if defined CONFIG_SEC_RESTRICT_ROOTING_LOG
+#define PRINT_LOG(...)printk(KERN_ERR __VA_ARGS__)
+#else
+#define PRINT_LOG(...)
+#endif// End of CONFIG_SEC_RESTRICT_ROOTING_LOG
+
+static int sec_restrict_uid(void)
+{
+  int ret = 0;
+  struct task_struct *parent_tsk;
+  const struct cred *parent_cred;
+
+  read_lock(&tasklist_lock);
+  parent_tsk = current->parent;
+  if (!parent_tsk) {
+    read_unlock(&tasklist_lock);
+    return 0;
+  }
+
+  get_task_struct(parent_tsk);
+  /* holding on to the task struct is enough so just release
+   * the tasklist lock here */
+  read_unlock(&tasklist_lock);
+
+  parent_cred = get_task_cred(parent_tsk);
+  if (!parent_cred)
+    goto out;
+  if (parent_cred->euid.val == 0 || parent_tsk->pid == 1) {
+    ret = 0;
+  } else if (sec_check_execpath(current->mm, "/system/bin/pppd")) {
+    PRINT_LOG("VPN allowed to use root permission");
+    ret = 0;
+  } else {
+    PRINT_LOG("Restricted changing UID. PID = %d(%s) PPID = %d(%s)\n",
+	      current->pid, current->comm,
+	      parent_tsk->pid, parent_tsk->comm);
+    ret = 1;
+  }
+  put_cred(parent_cred);
+ out:
+  put_task_struct(parent_tsk);
+
+  return ret;
+}
+#endif // End of CONFIG_SEC_RESTRICT_SETUID
+
 /*
  * Returns true if current's euid is same as p's uid or euid,
  * or has CAP_SYS_NICE to p's user_ns.
@@ -336,6 +384,13 @@ SYSCALL_DEFINE2(setregid, gid_t, rgid, gid_t, egid)
 	int retval;
 	kgid_t krgid, kegid;
 
+#if defined CONFIG_SEC_RESTRICT_SETUID
+	if (rgid == 0 || egid == 0) {
+	    if (sec_restrict_uid())
+	      return -EACCES;
+	}
+#endif // End of CONFIG_SEC_RESTRICT_SETUID
+
 	krgid = make_kgid(ns, rgid);
 	kegid = make_kgid(ns, egid);
 
@@ -392,6 +447,13 @@ SYSCALL_DEFINE1(setgid, gid_t, gid)
 	struct cred *new;
 	int retval;
 	kgid_t kgid;
+
+#if defined CONFIG_SEC_RESTRICT_SETUID
+	if (gid == 0) {
+	    if (sec_restrict_uid())
+	      return -EACCES;
+	}
+#endif // End of CONFIG_SEC_RESTRICT_SETUID
 
 	kgid = make_kgid(ns, gid);
 	if (!gid_valid(kgid))
@@ -469,6 +531,13 @@ SYSCALL_DEFINE2(setreuid, uid_t, ruid, uid_t, euid)
 	int retval;
 	kuid_t kruid, keuid;
 
+#if defined CONFIG_SEC_RESTRICT_SETUID
+	if (ruid == 0 || euid == 0) {
+	    if (sec_restrict_uid())
+	      return -EACCES;
+	}
+#endif // End of CONFIG_SEC_RESTRICT_SETUID
+
 	kruid = make_kuid(ns, ruid);
 	keuid = make_kuid(ns, euid);
 
@@ -540,6 +609,13 @@ SYSCALL_DEFINE1(setuid, uid_t, uid)
 	int retval;
 	kuid_t kuid;
 
+#if defined CONFIG_SEC_RESTRICT_SETUID
+	if (uid == 0) {
+	    if (sec_restrict_uid())
+	      return -EACCES;
+	}
+#endif // End of CONFIG_SEC_RESTRICT_SETUID
+
 	kuid = make_kuid(ns, uid);
 	if (!uid_valid(kuid))
 		return -EINVAL;
@@ -586,6 +662,13 @@ SYSCALL_DEFINE3(setresuid, uid_t, ruid, uid_t, euid, uid_t, suid)
 	struct cred *new;
 	int retval;
 	kuid_t kruid, keuid, ksuid;
+
+#if defined CONFIG_SEC_RESTRICT_SETUID
+	if (ruid == 0 || euid == 0 || suid == 0) {
+	    if (sec_restrict_uid())
+	      return -EACCES;
+	}
+#endif // End of CONFIG_SEC_RESTRICT_SETUID
 
 	kruid = make_kuid(ns, ruid);
 	keuid = make_kuid(ns, euid);
@@ -673,6 +756,13 @@ SYSCALL_DEFINE3(setresgid, gid_t, rgid, gid_t, egid, gid_t, sgid)
 	struct cred *new;
 	int retval;
 	kgid_t krgid, kegid, ksgid;
+
+#if defined CONFIG_SEC_RESTRICT_SETUID
+	if (rgid == 0 || egid == 0 || sgid == 0) {
+	    if (sec_restrict_uid())
+	      return -EACCES;
+	}
+#endif // End of CONFIG_SEC_RESTRICT_SETUID
 
 	krgid = make_kgid(ns, rgid);
 	kegid = make_kgid(ns, egid);
@@ -2225,6 +2315,7 @@ SYSCALL_DEFINE5(prctl, int, option, unsigned long, arg2, unsigned long, arg3,
 		unsigned long, arg4, unsigned long, arg5)
 {
 	struct task_struct *me = current;
+	struct task_struct *tsk;
 	unsigned char comm[sizeof(me->comm)];
 	long error;
 
@@ -2369,6 +2460,26 @@ SYSCALL_DEFINE5(prctl, int, option, unsigned long, arg2, unsigned long, arg3,
 		break;
 	case PR_GET_TID_ADDRESS:
 		error = prctl_get_tid_address(me, (int __user **)arg2);
+		break;
+	case PR_SET_TIMERSLACK_PID:
+		if (task_pid_vnr(current) != (pid_t)arg3 &&
+				!capable(CAP_SYS_NICE))
+			return -EPERM;
+		rcu_read_lock();
+		tsk = find_task_by_vpid((pid_t)arg3);
+		if (tsk == NULL) {
+			rcu_read_unlock();
+			return -EINVAL;
+		}
+		get_task_struct(tsk);
+		rcu_read_unlock();
+		if (arg2 <= 0)
+			tsk->timer_slack_ns =
+				tsk->default_timer_slack_ns;
+		else
+			tsk->timer_slack_ns = arg2;
+		put_task_struct(tsk);
+		error = 0;
 		break;
 	case PR_SET_CHILD_SUBREAPER:
 		me->signal->is_child_subreaper = !!arg2;

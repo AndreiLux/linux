@@ -18,6 +18,10 @@ ifneq ($(CONFIG_RELOCATABLE),)
 LDFLAGS_vmlinux		+= -pie -shared -Bsymbolic
 endif
 
+ifneq ($(CONFIG_RELOCATABLE_KERNEL),)
+LDFLAGS_vmlinux		+= -pie -Bsymbolic
+endif
+
 ifeq ($(CONFIG_ARM64_ERRATUM_843419),y)
   ifeq ($(call ld-option, --fix-cortex-a53-843419),)
 $(warning ld does not support --fix-cortex-a53-843419; kernel may be susceptible to erratum)
@@ -103,6 +107,10 @@ endif
 
 KBUILD_DTBS	:= dtbs
 
+ifeq ($(CONFIG_BUILD_ARM64_DT_OVERLAY),y)
+export DTC_FLAGS := -@
+endif
+
 all:	$(KBUILD_IMAGE) $(KBUILD_DTBS)
 
 boot := arch/arm64/boot
@@ -122,7 +130,8 @@ zinstall install:
 PHONY += dtbs dtbs_install
 
 dtbs: prepare scripts
-	$(Q)$(MAKE) $(build)=$(boot)/dts
+#	$(Q)$(MAKE) $(build)=$(boot)/dts
+	$(Q)$(MAKE) $(build)=$(boot)/dts/samsung
 
 dtbs_install:
 	$(Q)$(MAKE) $(dtbinst)=$(boot)/dts

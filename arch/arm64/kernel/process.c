@@ -45,6 +45,7 @@
 #include <linux/personality.h>
 #include <linux/notifier.h>
 #include <trace/events/power.h>
+#include <linux/percpu.h>
 
 #include <asm/alternative.h>
 #include <asm/compat.h>
@@ -59,6 +60,10 @@
 #include <linux/stackprotector.h>
 unsigned long __stack_chk_guard __read_mostly;
 EXPORT_SYMBOL(__stack_chk_guard);
+#endif
+
+#ifdef CONFIG_RKP_CFP_ROPP
+#include <linux/rkp_cfp.h>
 #endif
 
 /*
@@ -82,6 +87,16 @@ void arch_cpu_idle(void)
 	cpu_do_idle();
 	local_irq_enable();
 	trace_cpu_idle_rcuidle(PWR_EVENT_EXIT, smp_processor_id());
+}
+
+void arch_cpu_idle_enter(void)
+{
+	idle_notifier_call_chain(IDLE_START);
+}
+
+void arch_cpu_idle_exit(void)
+{
+	idle_notifier_call_chain(IDLE_END);
 }
 
 #ifdef CONFIG_HOTPLUG_CPU
@@ -179,7 +194,7 @@ static void show_data(unsigned long addr, int nbytes, const char *name)
 	 * don't attempt to dump non-kernel addresses or
 	 * values that are probably just small negative numbers
 	 */
-	if (addr < PAGE_OFFSET || addr > -256UL)
+	if (addr < KIMAGE_VADDR || addr > -256UL)
 		return;
 
 	printk("\n%s: %#lx:\n", name, addr);
@@ -204,29 +219,23 @@ static void show_data(unsigned long addr, int nbytes, const char *name)
 			if (probe_kernel_address(p, data)) {
 				printk(" ********");
 			} else {
-				printk(" %08x", data);
+				pr_cont(" %08x", data);
 			}
 			++p;
 		}
-		printk("\n");
+		pr_cont("\n");
 	}
 }
 
 static void show_extra_register_data(struct pt_regs *regs, int nbytes)
 {
 	mm_segment_t fs;
-	unsigned int i;
 
 	fs = get_fs();
 	set_fs(KERNEL_DS);
 	show_data(regs->pc - nbytes, nbytes * 2, "PC");
 	show_data(regs->regs[30] - nbytes, nbytes * 2, "LR");
 	show_data(regs->sp - nbytes, nbytes * 2, "SP");
-	for (i = 0; i < 30; i++) {
-		char name[4];
-		snprintf(name, sizeof(name), "X%u", i);
-		show_data(regs->regs[i] - nbytes, nbytes * 2, name);
-	}
 	set_fs(fs);
 }
 
@@ -266,13 +275,11 @@ void __show_regs(struct pt_regs *regs)
 		pr_cont("\n");
 	}
 	if (!user_mode(regs))
-		show_extra_register_data(regs, 128);
-	printk("\n");
+		show_extra_register_data(regs, 64);
 }
 
 void show_regs(struct pt_regs * regs)
 {
-	printk("\n");
 	__show_regs(regs);
 }
 
@@ -314,6 +321,31 @@ int arch_dup_task_struct(struct task_struct *dst, struct task_struct *src)
 
 asmlinkage void ret_from_fork(void) asm("ret_from_fork");
 
+#ifdef CONFIG_RKP_CFP_ROPP
+static inline void ropp_change_key(struct task_struct *p)
+{
+#ifdef CONFIG_RKP_CFP_ROPP_SYSREGKEY
+	task_thread_info(p)->rrk = get_random_long();
+
+#ifdef SYSREG_DEBUG
+	task_thread_info(p)->rrk = ropp_fixed_key ^ ropp_master_key;
+#endif
+
+#elif defined CONFIG_RKP_CFP_ROPP_RANDKEY
+	unsigned long new_key = 0x0;
+
+	asm volatile("mrs %0, cntpct_el0" : "=r" (new_key));
+	task_thread_info(p)->rrk = new_key;
+#elif defined CONFIG_RKP_CFP_ROPP_FIXKEY
+	task_thread_info(p)->rrk = ropp_fixed_key;
+#elif defined CONFIG_RKP_CFP_ROPP_ZEROKEY
+	task_thread_info(p)->rrk = 0x0;
+#else
+	#error "Please choose one ROPP key scheme"
+#endif
+}
+#endif
+
 int copy_thread(unsigned long clone_flags, unsigned long stack_start,
 		unsigned long stk_sz, struct task_struct *p)
 {
@@ -353,6 +385,9 @@ int copy_thread(unsigned long clone_flags, unsigned long stack_start,
 		p->thread.cpu_context.x19 = stack_start;
 		p->thread.cpu_context.x20 = stk_sz;
 	}
+#ifdef CONFIG_RKP_CFP_ROPP
+	ropp_change_key(p);
+#endif
 	p->thread.cpu_context.pc = (unsigned long)ret_from_fork;
 	p->thread.cpu_context.sp = (unsigned long)childregs;
 
@@ -388,6 +423,20 @@ void uao_thread_switch(struct task_struct *next)
 }
 
 /*
+ * We store our current task in sp_el0, which is clobbered by userspace. Keep a
+ * shadow copy so that we can restore this upon entry from userspace.
+ *
+ * This is *only* for exception entry from EL0, and is not valid until we
+ * __switch_to() a user task.
+ */
+DEFINE_PER_CPU(struct task_struct *, __entry_task);
+
+static void entry_task_switch(struct task_struct *next)
+{
+	__this_cpu_write(__entry_task, next);
+}
+
+/*
  * Thread switching.
  */
 struct task_struct *__switch_to(struct task_struct *prev,
@@ -399,6 +448,7 @@ struct task_struct *__switch_to(struct task_struct *prev,
 	tls_thread_switch(next);
 	hw_breakpoint_thread_switch(next);
 	contextidr_thread_switch(next);
+	entry_task_switch(next);
 	uao_thread_switch(next);
 
 	/*
@@ -416,9 +466,13 @@ struct task_struct *__switch_to(struct task_struct *prev,
 unsigned long get_wchan(struct task_struct *p)
 {
 	struct stackframe frame;
-	unsigned long stack_page;
+	unsigned long stack_page, ret = 0;
 	int count = 0;
 	if (!p || p == current || p->state == TASK_RUNNING)
+		return 0;
+
+	stack_page = (unsigned long)try_get_task_stack(p);
+	if (!stack_page)
 		return 0;
 
 	frame.fp = thread_saved_fp(p);
@@ -427,16 +481,20 @@ unsigned long get_wchan(struct task_struct *p)
 #ifdef CONFIG_FUNCTION_GRAPH_TRACER
 	frame.graph = p->curr_ret_stack;
 #endif
-	stack_page = (unsigned long)task_stack_page(p);
 	do {
 		if (frame.sp < stack_page ||
 		    frame.sp >= stack_page + THREAD_SIZE ||
 		    unwind_frame(p, &frame))
-			return 0;
-		if (!in_sched_functions(frame.pc))
-			return frame.pc;
+			goto out;
+		if (!in_sched_functions(frame.pc)) {
+			ret = frame.pc;
+			goto out;
+		}
 	} while (count ++ < 16);
-	return 0;
+
+out:
+	put_task_stack(p);
+	return ret;
 }
 
 unsigned long arch_align_stack(unsigned long sp)
