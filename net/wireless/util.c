@@ -15,7 +15,9 @@
 #include <linux/mpls.h>
 #include "core.h"
 #include "rdev-ops.h"
-
+#if (defined (CONFIG_HW_VOWIFI) || defined (CONFIG_HW_ABS))
+#include "nl80211.h"
+#endif
 
 struct ieee80211_rate *
 ieee80211_get_response_rate(struct ieee80211_supported_band *sband,
@@ -897,6 +899,16 @@ void cfg80211_process_wdev_events(struct wireless_dev *wdev)
 		case EVENT_STOPPED:
 			__cfg80211_leave(wiphy_to_rdev(wdev->wiphy), wdev);
 			break;
+#ifdef CONFIG_HW_VOWIFI
+		case EVENT_DRV_VOWIFI:
+			cfg80211_do_drv_private(wdev->netdev, GFP_KERNEL, NL80211_CMD_VOWIFI);
+			break;
+#endif
+#ifdef CONFIG_HW_ABS
+		case EVENT_DRV_ANT:
+			cfg80211_do_drv_private(wdev->netdev, GFP_KERNEL, NL80211_CMD_ANT);
+			break;
+#endif
 		}
 		wdev_unlock(wdev);
 

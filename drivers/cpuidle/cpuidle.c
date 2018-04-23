@@ -25,6 +25,7 @@
 
 #include "cpuidle.h"
 
+/*lint -e454 -e455 -e570*/
 DEFINE_PER_CPU(struct cpuidle_device *, cpuidle_devices);
 DEFINE_PER_CPU(struct cpuidle_device, cpuidle_dev);
 
@@ -662,3 +663,4 @@ static int __init cpuidle_init(void)
 
 module_param(off, int, 0444);
 core_initcall(cpuidle_init);
+/*lint +e454 +e455 +e570*/

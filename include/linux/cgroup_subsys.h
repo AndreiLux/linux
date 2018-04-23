@@ -18,6 +18,10 @@
 SUBSYS(cpuset)
 #endif
 
+#if IS_ENABLED(CONFIG_HW_CGROUP_PIDS)
+SUBSYS(pids)
+#endif
+
 #if IS_ENABLED(CONFIG_CGROUP_SCHED)
 SUBSYS(cpu)
 #endif
@@ -62,6 +66,10 @@ SUBSYS(net_prio)
 SUBSYS(hugetlb)
 #endif
 
+#if IS_ENABLED(CONFIG_CGROUP_IOLIMIT)
+SUBSYS(iolimit)
+#endif
+
 /*
  * Subsystems that implement the can_fork() family of callbacks.
  */
@@ -78,6 +86,10 @@ SUBSYS_TAG(CANFORK_END)
  */
 #if IS_ENABLED(CONFIG_CGROUP_DEBUG)
 SUBSYS(debug)
+#endif
+
+#if IS_ENABLED(CONFIG_HW_CGROUP_IONICE)
+SUBSYS(ionice)
 #endif
 
 #ifdef __TMP_SUBSYS_TAG

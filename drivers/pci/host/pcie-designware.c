@@ -150,7 +150,10 @@ static int dw_pcie_wr_own_conf(struct pcie_port *pp, int where, int size,
 
 	return ret;
 }
-
+#ifdef CONFIG_PCIE_KIRIN
+extern void dw_pcie_prog_outbound_atu(struct pcie_port *pp, int index,
+		int type, u64 cpu_addr, u64 pci_addr, u32 size);
+#else
 static void dw_pcie_prog_outbound_atu(struct pcie_port *pp, int index,
 		int type, u64 cpu_addr, u64 pci_addr, u32 size)
 {
@@ -165,7 +168,7 @@ static void dw_pcie_prog_outbound_atu(struct pcie_port *pp, int index,
 	dw_pcie_writel_rc(pp, type, PCIE_ATU_CR1);
 	dw_pcie_writel_rc(pp, PCIE_ATU_ENABLE, PCIE_ATU_CR2);
 }
-
+#endif
 static struct irq_chip dw_msi_irq_chip = {
 	.name = "PCI-MSI",
 	.irq_enable = pci_msi_unmask_irq,
@@ -513,10 +516,16 @@ int dw_pcie_host_init(struct pcie_port *pp)
 				return ret;
 		}
 	}
-
+#ifdef CONFIG_PCIE_KIRIN
+	if (pp->ops->host_init) {
+		ret = pp->ops->host_init(pp);
+		if (ret)
+			return ret;
+	}
+#else
 	if (pp->ops->host_init)
 		pp->ops->host_init(pp);
-
+#endif
 	if (!pp->ops->rd_other_conf)
 		dw_pcie_prog_outbound_atu(pp, PCIE_ATU_REGION_INDEX1,
 					  PCIE_ATU_TYPE_MEM, pp->mem_base,
@@ -590,9 +599,9 @@ static int dw_pcie_rd_other_conf(struct pcie_port *pp, struct pci_bus *bus,
 				  type, cpu_addr,
 				  busdev, cfg_size);
 	ret = dw_pcie_cfg_read(va_cfg_base + where, size, val);
-	dw_pcie_prog_outbound_atu(pp, PCIE_ATU_REGION_INDEX0,
-				  PCIE_ATU_TYPE_IO, pp->io_base,
-				  pp->io_bus_addr, pp->io_size);
+	dw_pcie_prog_outbound_atu(pp, PCIE_ATU_REGION_INDEX1,
+				  PCIE_ATU_TYPE_MEM, pp->mem_base,
+				  pp->mem_bus_addr, pp->mem_size);
 
 	return ret;
 }
@@ -624,9 +633,9 @@ static int dw_pcie_wr_other_conf(struct pcie_port *pp, struct pci_bus *bus,
 				  type, cpu_addr,
 				  busdev, cfg_size);
 	ret = dw_pcie_cfg_write(va_cfg_base + where, size, val);
-	dw_pcie_prog_outbound_atu(pp, PCIE_ATU_REGION_INDEX0,
-				  PCIE_ATU_TYPE_IO, pp->io_base,
-				  pp->io_bus_addr, pp->io_size);
+	dw_pcie_prog_outbound_atu(pp, PCIE_ATU_REGION_INDEX1,
+				  PCIE_ATU_TYPE_MEM, pp->mem_base,
+				  pp->mem_bus_addr, pp->mem_size);
 
 	return ret;
 }

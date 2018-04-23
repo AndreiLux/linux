@@ -441,6 +441,22 @@ static void scsi_report_sense(struct scsi_device *sdev,
 	}
 }
 
+/*enable samsung UFS ffu link lost recovery solution on kirin*/
+#define FEATURE_SAMSUNG_FFU_LINK_LOST_RECOVERY
+
+/* define sense data value of samsung UFS link lost status after ffu */
+#ifdef FEATURE_SAMSUNG_FFU_LINK_LOST_RECOVERY
+
+#define UFS_VENDOR_STRING_SAMSUNG "SAMSUNG"
+#define SAMSUNG_FFU_LINK_LOST_ASC_VALUE     0x80
+#define SAMSUNG_FFU_LINK_LOST_ASCQ_VALUE    0x09
+
+#ifndef UFSHCD
+#define UFSHCD "ufshcd"
+#endif
+
+#endif
+
 /**
  * scsi_check_sense - Examine scsi cmd sense
  * @scmd:	Cmd to have sense checked.
@@ -458,7 +474,9 @@ static int scsi_check_sense(struct scsi_cmnd *scmd)
 	struct scsi_sense_hdr sshdr;
 
 	if (! scsi_command_normalize_sense(scmd, &sshdr))
+	{
 		return FAILED;	/* no valid sense data */
+	}
 
 	scsi_report_sense(sdev, &sshdr);
 
@@ -584,9 +602,17 @@ static int scsi_check_sense(struct scsi_cmnd *scmd)
 		return NEEDS_RETRY;
 
 	case HARDWARE_ERROR:
-		if (scmd->device->retry_hwerror)
+		if (sshdr.asc == 0x1 &&
+			sshdr.ascq == 0x0) {/*for hiVV internel error*/
+			pr_err("%s: hiVV hwerror\n", __func__);
+			return FAILED;
+		}
+		if (scmd->device->retry_hwerror) {
 			return ADD_TO_MLQUEUE;
-		else
+		} else if(scmd->device->reset_hwerror) {
+			pr_err("%s: reset hwerror\n", __func__);
+			return FAILED;
+		} else
 			set_host_byte(scmd, DID_TARGET_FAILURE);
 
 	case ILLEGAL_REQUEST:
@@ -596,6 +622,23 @@ static int scsi_check_sense(struct scsi_cmnd *scmd)
 		    sshdr.asc == 0x26) { /* Parameter value invalid */
 			set_host_byte(scmd, DID_TARGET_FAILURE);
 		}
+
+#ifdef FEATURE_SAMSUNG_FFU_LINK_LOST_RECOVERY
+		if( (sdev->type == TYPE_DISK)
+			&& (sshdr.asc == SAMSUNG_FFU_LINK_LOST_ASC_VALUE)
+			&& (sshdr.ascq == SAMSUNG_FFU_LINK_LOST_ASCQ_VALUE)
+			&& (NULL != sdev->vendor)
+			&& !strncmp(sdev->vendor,UFS_VENDOR_STRING_SAMSUNG,strlen(UFS_VENDOR_STRING_SAMSUNG))
+			&& (NULL != sdev->host)
+			&& (NULL != sdev->host->hostt)
+			&& (NULL != sdev->host->hostt->name)
+			&& !strncmp(sdev->host->hostt->name,UFSHCD,strlen(UFSHCD)) )
+		{
+			SCSI_LOG_ERROR_RECOVERY(3,sdev_printk(KERN_INFO, sdev,"%s: UFS FFU LINK LOST SAMSUNG return FAILED and scsi retry.\n",current->comm));
+			return FAILED;
+		}
+#endif
+
 		return SUCCESS;
 
 	default:

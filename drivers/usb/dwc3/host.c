@@ -50,6 +50,7 @@ int dwc3_host_init(struct dwc3 *dwc)
 	memset(&pdata, 0, sizeof(pdata));
 
 	pdata.usb3_lpm_capable = dwc->usb3_lpm_capable;
+	pdata.ctrl_nyet_abnormal = dwc->ctrl_nyet_abnormal;
 
 	ret = platform_device_add_data(xhci, &pdata, sizeof(pdata));
 	if (ret) {
@@ -57,10 +58,16 @@ int dwc3_host_init(struct dwc3 *dwc)
 		goto err1;
 	}
 
+#ifdef CONFIG_USB_DWC3_HISI
+	/* if otg, otg will do device_add */
+	if (dwc->dwc_otg)
+		return 0;
+#endif
+
 	phy_create_lookup(dwc->usb2_generic_phy, "usb2-phy",
-			  dev_name(&xhci->dev));
+			dev_name(&xhci->dev));
 	phy_create_lookup(dwc->usb3_generic_phy, "usb3-phy",
-			  dev_name(&xhci->dev));
+			dev_name(&xhci->dev));
 
 	ret = platform_device_add(xhci);
 	if (ret) {
@@ -81,9 +88,14 @@ err1:
 
 void dwc3_host_exit(struct dwc3 *dwc)
 {
+#ifdef CONFIG_USB_DWC3_HISI
+	if (dwc->dwc_otg)
+		return;
+#endif
+
 	phy_remove_lookup(dwc->usb2_generic_phy, "usb2-phy",
-			  dev_name(&dwc->xhci->dev));
+			dev_name(&dwc->xhci->dev));
 	phy_remove_lookup(dwc->usb3_generic_phy, "usb3-phy",
-			  dev_name(&dwc->xhci->dev));
+			dev_name(&dwc->xhci->dev));
 	platform_device_unregister(dwc->xhci);
 }

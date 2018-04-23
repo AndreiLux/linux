@@ -31,6 +31,9 @@
 #include <linux/ipv6.h>
 #include <linux/seq_file.h>
 #include <linux/poll.h>
+#ifdef CONFIG_HW_NETWORK_MEASUREMENT
+#include <huawei_platform/emcom/smartcare/network_measurement/nm.h>
+#endif /* CONFIG_HW_NETWORK_MEASUREMENT */
 
 /**
  *	struct udp_skb_cb  -  UDP(-Lite) private variables
@@ -187,6 +190,9 @@ void udp_lib_rehash(struct sock *sk, u16 new_hash);
 
 static inline void udp_lib_close(struct sock *sk, long timeout)
 {
+#ifdef CONFIG_HW_NETWORK_MEASUREMENT
+	udp_measure_deinit(sk);
+#endif /* CONFIG_HW_NETWORK_MEASUREMENT */
 	sk_common_release(sk);
 }
 

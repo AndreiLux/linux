@@ -370,7 +370,7 @@ void __init create_pgd_mapping(struct mm_struct *mm, phys_addr_t phys,
 			     late_pgtable_alloc);
 }
 
-static void create_mapping_late(phys_addr_t phys, unsigned long virt,
+void create_mapping_late(phys_addr_t phys, unsigned long virt,
 				  phys_addr_t size, pgprot_t prot)
 {
 	if (virt < VMALLOC_START) {
@@ -385,7 +385,7 @@ static void create_mapping_late(phys_addr_t phys, unsigned long virt,
 
 static void __init __map_memblock(pgd_t *pgd, phys_addr_t start, phys_addr_t end)
 {
-	unsigned long kernel_start = __pa(_stext);
+	unsigned long kernel_start = __pa(_text);
 	unsigned long kernel_end = __pa(__init_begin);
 
 	/*
@@ -402,7 +402,7 @@ static void __init __map_memblock(pgd_t *pgd, phys_addr_t start, phys_addr_t end
 	}
 
 	/*
-	 * This block overlaps the kernel text/rodata mapping.
+	 * This block overlaps the kernel text/rodata mappings.
 	 * Map the portion(s) which don't overlap.
 	 */
 	if (start < kernel_start)
@@ -417,7 +417,7 @@ static void __init __map_memblock(pgd_t *pgd, phys_addr_t start, phys_addr_t end
 				     early_pgtable_alloc);
 
 	/*
-	 * Map the linear alias of the [_stext, __init_begin) interval as
+	 * Map the linear alias of the [_text, __init_begin) interval as
 	 * read-only/non-executable. This makes the contents of the
 	 * region accessible to subsystems such as hibernate, but
 	 * protects it from inadvertent modification or execution.
@@ -449,8 +449,8 @@ void mark_rodata_ro(void)
 {
 	unsigned long section_size;
 
-	section_size = (unsigned long)_etext - (unsigned long)_stext;
-	create_mapping_late(__pa(_stext), (unsigned long)_stext,
+	section_size = (unsigned long)_etext - (unsigned long)_text;
+	create_mapping_late(__pa(_text), (unsigned long)_text,
 			    section_size, PAGE_KERNEL_ROX);
 	/*
 	 * mark .rodata as read only. Use __init_begin rather than __end_rodata
@@ -471,8 +471,8 @@ void fixup_init(void)
 	unmap_kernel_range((u64)__init_begin, (u64)(__init_end - __init_begin));
 }
 
-static void __init map_kernel_chunk(pgd_t *pgd, void *va_start, void *va_end,
-				    pgprot_t prot, struct vm_struct *vma)
+static void __init map_kernel_segment(pgd_t *pgd, void *va_start, void *va_end,
+				      pgprot_t prot, struct vm_struct *vma)
 {
 	phys_addr_t pa_start = __pa(va_start);
 	unsigned long size = va_end - va_start;
@@ -499,11 +499,11 @@ static void __init map_kernel(pgd_t *pgd)
 {
 	static struct vm_struct vmlinux_text, vmlinux_rodata, vmlinux_init, vmlinux_data;
 
-	map_kernel_chunk(pgd, _stext, _etext, PAGE_KERNEL_EXEC, &vmlinux_text);
-	map_kernel_chunk(pgd, __start_rodata, __init_begin, PAGE_KERNEL, &vmlinux_rodata);
-	map_kernel_chunk(pgd, __init_begin, __init_end, PAGE_KERNEL_EXEC,
-			 &vmlinux_init);
-	map_kernel_chunk(pgd, _data, _end, PAGE_KERNEL, &vmlinux_data);
+	map_kernel_segment(pgd, _text, _etext, PAGE_KERNEL_EXEC, &vmlinux_text);
+	map_kernel_segment(pgd, __start_rodata, __init_begin, PAGE_KERNEL, &vmlinux_rodata);
+	map_kernel_segment(pgd, __init_begin, __init_end, PAGE_KERNEL_EXEC,
+			   &vmlinux_init);
+	map_kernel_segment(pgd, _data, _end, PAGE_KERNEL, &vmlinux_data);
 
 	if (!pgd_val(*pgd_offset_raw(pgd, FIXADDR_START))) {
 		/*
@@ -557,9 +557,6 @@ void __init paging_init(void)
 
 	pgd_clear_fixmap();
 	memblock_free(pgd_phys, PAGE_SIZE);
-
-	/* Ensure the zero page is visible to the page table walker */
-	dsb(ishst);
 
 	/*
 	 * We only reuse the PGD from the swapper_pg_dir, not the pud + pmd

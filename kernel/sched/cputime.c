@@ -6,7 +6,9 @@
 #include <linux/context_tracking.h>
 #include "sched.h"
 #include "walt.h"
-
+#ifdef CONFIG_CPU_FREQ_POWER_STAT
+#include <linux/cpufreq.h>
+#endif
 
 #ifdef CONFIG_IRQ_TIME_ACCOUNTING
 
@@ -165,6 +167,11 @@ void account_user_time(struct task_struct *p, cputime_t cputime,
 
 	/* Account for user time used */
 	acct_account_cputime(p);
+
+#ifdef CONFIG_CPU_FREQ_POWER_STAT
+	/* Account power usage for user time */
+	acct_update_power(p, cputime);
+#endif
 }
 
 /*
@@ -215,6 +222,11 @@ void __account_system_time(struct task_struct *p, cputime_t cputime,
 
 	/* Account for system time used */
 	acct_account_cputime(p);
+
+#ifdef CONFIG_CPU_FREQ_POWER_STAT
+	/* Account power usage for system time */
+	acct_update_power(p, cputime);
+#endif
 }
 
 /*

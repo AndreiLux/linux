@@ -136,6 +136,7 @@
 #include <linux/mmdebug.h>
 
 extern s64			memstart_addr;
+extern s64			phystart_addr;
 /* PHYS_OFFSET - the physical address of the start of memory. */
 #define PHYS_OFFSET		({ VM_BUG_ON(memstart_addr & 1); memstart_addr; })
 
@@ -159,7 +160,7 @@ extern u64			kimage_voffset;
  * direct-mapped view.  We assume this is the first page
  * of RAM in the mem_map as well.
  */
-#define PHYS_PFN_OFFSET	(PHYS_OFFSET >> PAGE_SHIFT)
+#define PHYS_PFN_OFFSET	(phystart_addr >> PAGE_SHIFT)
 
 /*
  * Note: Drivers should NOT use these.  They are the wrong

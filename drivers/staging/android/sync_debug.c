@@ -251,4 +251,8 @@ void sync_dump(void)
 	}
 }
 
+char *sync_get_dump_buf(void)
+{
+	return sync_dump_buf;
+}
 #endif

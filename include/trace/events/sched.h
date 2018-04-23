@@ -118,6 +118,51 @@ static inline long __trace_sched_switch_state(bool preempt, struct task_struct *
 }
 #endif /* CREATE_TRACE_POINTS */
 
+#ifdef CONFIG_HW_VIP_THREAD
+/*
+ * Tracepoint for sched vip
+ */
+DECLARE_EVENT_CLASS(sched_vip_template,
+
+	TP_PROTO(struct task_struct *p, char *msg),
+
+	TP_ARGS(__perf_task(p), msg),
+
+	TP_STRUCT__entry(
+		__array(	char,	comm,	TASK_COMM_LEN	)
+		__field(	pid_t,	pid			)
+		__field(	int,	prio			)
+		__array(	char,	msg, 	VIP_MSG_LEN	)
+		__field(	int,	target_cpu		)
+		__field(    u64,    dynamic_vip)
+		__field(    int,    vip_depth)
+	),
+
+	TP_fast_assign(
+		memcpy(__entry->comm, p->comm, TASK_COMM_LEN);
+		__entry->pid		= p->pid;
+		__entry->prio		= p->prio;
+		memcpy(__entry->msg, msg, VIP_MSG_LEN);
+		__entry->target_cpu	= task_cpu(p);
+		__entry->dynamic_vip   = atomic64_read(&p->dynamic_vip);
+		__entry->vip_depth     = p->vip_depth;
+	),
+
+	TP_printk("comm=%s pid=%d prio=%d msg=%s target_cpu=%03d dynamic_vip:%llx vip_depth:%d",
+		  __entry->comm, __entry->pid, __entry->prio,
+		  __entry->msg, __entry->target_cpu, __entry->dynamic_vip, __entry->vip_depth)
+);
+
+DEFINE_EVENT(sched_vip_template, sched_vip_queue_op,
+         TP_PROTO(struct task_struct *p, char *msg),
+	     TP_ARGS(p, msg));
+
+DEFINE_EVENT(sched_vip_template, sched_vip_sched,
+         TP_PROTO(struct task_struct *p, char *msg),
+	     TP_ARGS(p, msg));
+
+#endif
+
 /*
  * Tracepoint for task switches, performed by the scheduler:
  */
@@ -707,23 +752,80 @@ TRACE_EVENT(sched_load_avg_cpu,
 );
 
 /*
+ * Tracepoint for eas attribute store
+ */
+TRACE_EVENT(eas_attr_store,
+
+	TP_PROTO(const char *name, int value),
+
+	TP_ARGS(name, value),
+
+	TP_STRUCT__entry(
+		__array( char,	name,	TASK_COMM_LEN	)
+		__field( int,		value		)
+	),
+
+	TP_fast_assign(
+		memcpy(__entry->name, name, TASK_COMM_LEN);
+		__entry->value		= value;
+	),
+
+	TP_printk("name=%s value=%d", __entry->name, __entry->value)
+);
+
+/*
+ * Tracepoint for schedtune_boost
+ */
+TRACE_EVENT(sched_tune_boost,
+
+	TP_PROTO(const char *name, int boost),
+
+	TP_ARGS(name, boost),
+
+	TP_STRUCT__entry(
+		__array( char,	name,	TASK_COMM_LEN	)
+		__field( int,		boost		)
+	),
+
+	TP_fast_assign(
+		memcpy(__entry->name, name, TASK_COMM_LEN);
+		__entry->boost		= boost;
+	),
+
+	TP_printk("name=%s boost=%d", __entry->name, __entry->boost)
+);
+
+/*
  * Tracepoint for sched_tune_config settings
  */
 TRACE_EVENT(sched_tune_config,
 
-	TP_PROTO(int boost),
+	TP_PROTO(int boost, int pb_nrg_gain, int pb_cap_gain, int pc_nrg_gain, int pc_cap_gain),
 
-	TP_ARGS(boost),
+	TP_ARGS(boost, pb_nrg_gain, pb_cap_gain, pc_nrg_gain, pc_cap_gain),
 
 	TP_STRUCT__entry(
 		__field( int,	boost		)
+		__field( int,	pb_nrg_gain	)
+		__field( int,	pb_cap_gain	)
+		__field( int,	pc_nrg_gain	)
+		__field( int,	pc_cap_gain	)
 	),
 
 	TP_fast_assign(
 		__entry->boost 	= boost;
+		__entry->pb_nrg_gain	= pb_nrg_gain;
+		__entry->pb_cap_gain	= pb_cap_gain;
+		__entry->pc_nrg_gain	= pc_nrg_gain;
+		__entry->pc_cap_gain	= pc_cap_gain;
 	),
 
-	TP_printk("boost=%d ", __entry->boost)
+	TP_printk("boost=%d "
+			"pb_nrg_gain=%d pb_cap_gain=%d "
+			"pc_nrg_gain=%d pc_cap_gain=%d",
+		__entry->boost,
+		__entry->pb_nrg_gain, __entry->pb_cap_gain,
+		__entry->pc_nrg_gain, __entry->pc_cap_gain)
 );
 
 /*
@@ -852,11 +954,11 @@ TRACE_EVENT(sched_energy_diff,
 
 	TP_PROTO(struct task_struct *tsk, int scpu, int dcpu, int udelta,
 		int nrgb, int nrga, int nrgd, int capb, int capa, int capd,
-		int nrgn, int nrgp),
+		int nrgn, int nrgp, int boost),
 
 	TP_ARGS(tsk, scpu, dcpu, udelta,
 		nrgb, nrga, nrgd, capb, capa, capd,
-		nrgn, nrgp),
+		nrgn, nrgp, boost),
 
 	TP_STRUCT__entry(
 		__array( char,	comm,	TASK_COMM_LEN	)
@@ -872,6 +974,7 @@ TRACE_EVENT(sched_energy_diff,
 		__field( int,	capd	)
 		__field( int,	nrgn	)
 		__field( int,	nrgp	)
+		__field( int,	boost	)
 	),
 
 	TP_fast_assign(
@@ -888,18 +991,19 @@ TRACE_EVENT(sched_energy_diff,
 		__entry->capd 		= capd;
 		__entry->nrgn 		= nrgn;
 		__entry->nrgp 		= nrgp;
+		__entry->boost		= boost;
 	),
 
 	TP_printk("pid=%d comm=%s "
 			"src_cpu=%d dst_cpu=%d usage_delta=%d "
 			"nrg_before=%d nrg_after=%d nrg_diff=%d "
 			"cap_before=%d cap_after=%d cap_delta=%d "
-			"nrg_delta=%d nrg_payoff=%d",
+			"nrg_delta=%d nrg_payoff=%d boost=%d",
 		__entry->pid, __entry->comm,
 		__entry->scpu, __entry->dcpu, __entry->udelta,
 		__entry->nrgb, __entry->nrga, __entry->nrgd,
 		__entry->capb, __entry->capa, __entry->capd,
-		__entry->nrgn, __entry->nrgp)
+		__entry->nrgn, __entry->nrgp, __entry->boost)
 );
 
 /*
@@ -1044,7 +1148,7 @@ TRACE_EVENT(walt_update_history,
 		__field(	 int,	samples			)
 		__field(	 int,	evt			)
 		__field(	 u64,	demand			)
-		__field(unsigned int,	walt_avg		)
+		__field(	 u64,	walt_avg		)
 		__field(unsigned int,	pelt_avg		)
 		__array(	 u32,	hist, RAVG_HIST_SIZE_MAX)
 		__field(	 int,	cpu			)
@@ -1066,7 +1170,7 @@ TRACE_EVENT(walt_update_history,
 	),
 
 	TP_printk("%d (%s): runtime %u samples %d event %d demand %llu"
-		" walt %u pelt %u (hist: %u %u %u %u %u) cpu %d",
+		" walt %llu pelt %u (hist: %u %u %u %u %u) cpu %d",
 		__entry->pid, __entry->comm,
 		__entry->runtime, __entry->samples, __entry->evt,
 		__entry->demand,

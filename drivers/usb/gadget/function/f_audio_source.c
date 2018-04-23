@@ -17,6 +17,7 @@
 #include <linux/device.h>
 #include <linux/usb/audio.h>
 #include <linux/wait.h>
+#include <linux/pm_qos.h>
 #include <sound/core.h>
 #include <sound/initval.h>
 #include <sound/pcm.h>
@@ -268,6 +269,8 @@ struct audio_dev {
 	/* number of frames sent since start_time */
 	s64				frames_sent;
 	struct audio_source_config	*config;
+	/* for creating and issuing QoS requests */
+	struct pm_qos_request pm_qos;
 };
 
 static inline struct audio_dev *func_to_audio(struct usb_function *f)
@@ -310,6 +313,7 @@ static struct device_attribute *audio_source_function_attributes[] = {
 static struct usb_request *audio_request_new(struct usb_ep *ep, int buffer_size)
 {
 	struct usb_request *req = usb_ep_alloc_request(ep, GFP_KERNEL);
+
 	if (!req)
 		return NULL;
 
@@ -377,10 +381,9 @@ static void audio_send(struct audio_dev *audio)
 
 	/* compute number of frames to send */
 	now = ktime_get();
-	msecs = ktime_to_ns(now) - ktime_to_ns(audio->start_time);
-	do_div(msecs, 1000000);
-	frames = msecs * SAMPLE_RATE;
-	do_div(frames, 1000);
+	msecs = div_s64((ktime_to_ns(now) - ktime_to_ns(audio->start_time)),
+			1000000);
+	frames = div_s64((msecs * SAMPLE_RATE), 1000);
 
 	/* Readjust our frames_sent if we fall too far behind.
 	 * If we get too far behind it is better to drop some frames than
@@ -611,6 +614,7 @@ static int snd_card_setup(struct usb_configuration *c,
 static struct audio_source_instance *to_fi_audio_source(
 	const struct usb_function_instance *fi);
 
+#include "function-hisi/f_audio_source_hisi.c"
 
 /* audio function driver setup/binding */
 static int
@@ -668,8 +672,18 @@ audio_bind(struct usb_configuration *c, struct usb_function *f)
 		hs_as_in_ep_desc.bEndpointAddress =
 			fs_as_in_ep_desc.bEndpointAddress;
 
+#ifdef CONFIG_HISI_USB_FUNC_ADD_SS_DESC
+	if (gadget_is_superspeed(c->cdev->gadget)
+			|| gadget_is_superspeed_plus(c->cdev->gadget))
+		ss_as_in_ep_desc.bEndpointAddress =
+			fs_as_in_ep_desc.bEndpointAddress;
+#endif
+
 	f->fs_descriptors = fs_audio_desc;
 	f->hs_descriptors = hs_audio_desc;
+#ifdef CONFIG_HISI_USB_FUNC_ADD_SS_DESC
+	f->ss_descriptors = ss_audio_desc;
+#endif
 
 	for (i = 0, status = 0; i < IN_EP_REQ_COUNT && status == 0; i++) {
 		req = audio_request_new(ep, IN_EP_MAX_PACKET_SIZE);
@@ -740,6 +754,10 @@ static int audio_pcm_open(struct snd_pcm_substream *substream)
 	runtime->hw.channels_max = 2;
 
 	audio->substream = substream;
+
+	/* Add the QoS request and set the latency to 0 */
+	pm_qos_add_request(&audio->pm_qos, PM_QOS_CPU_DMA_LATENCY, 0);
+
 	return 0;
 }
 
@@ -749,6 +767,10 @@ static int audio_pcm_close(struct snd_pcm_substream *substream)
 	unsigned long flags;
 
 	spin_lock_irqsave(&audio->lock, flags);
+
+	/* Remove the QoS request */
+	pm_qos_remove_request(&audio->pm_qos);
+
 	audio->substream = NULL;
 	spin_unlock_irqrestore(&audio->lock, flags);
 
@@ -797,7 +819,7 @@ static snd_pcm_uframes_t audio_pcm_pointer(struct snd_pcm_substream *substream)
 	ssize_t bytes = audio->buffer_pos - audio->buffer_start;
 
 	/* return offset of next frame to fill in our buffer */
-	return bytes_to_frames(runtime, bytes);
+	return bytes_to_frames(runtime, bytes);/* [false alarm]:original code */
 }
 
 static int audio_pcm_playback_trigger(struct snd_pcm_substream *substream,

@@ -321,3 +321,8 @@ config PM_GENERIC_DOMAINS_OF
 
 config CPU_PM
 	bool
+
+config HUAWEI_SLEEPLOG
+    bool "huawei sleeplogcat"
+    default n
+	help

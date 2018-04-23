@@ -2392,7 +2392,6 @@ ppp_unregister_channel(struct ppp_channel *chan)
 	spin_unlock_bh(&pn->all_channels_lock);
 	put_net(pch->chan_net);
 	pch->chan_net = NULL;
-
 	pch->file.dead = 1;
 	wake_up_interruptible(&pch->file.rwait);
 	if (atomic_dec_and_test(&pch->file.refcnt))

@@ -11,6 +11,31 @@
 
 #define TPS(x)  tracepoint_string(x)
 
+TRACE_EVENT(cpufreq_policy_update,
+
+	TP_PROTO(struct task_struct *p, unsigned int min, unsigned int max),
+
+	TP_ARGS(p, min, max),
+
+	TP_STRUCT__entry(
+		__array(	char,	comm,	TASK_COMM_LEN	)
+		__field(	pid_t,	pid			)
+		__field(	unsigned int,	min		)
+		__field(	unsigned int,	max		)
+	),
+
+	TP_fast_assign(
+		memcpy(__entry->comm, p->comm, TASK_COMM_LEN);
+		__entry->pid		= p->pid;
+		__entry->min		= min;
+		__entry->max		= max;
+	),
+
+	TP_printk("comm=%s pid=%d min=%u max=%u",
+		  __entry->comm, __entry->pid,
+		  __entry->min, __entry->max)
+);
+
 DECLARE_EVENT_CLASS(cpu,
 
 	TP_PROTO(unsigned int state, unsigned int cpu_id),

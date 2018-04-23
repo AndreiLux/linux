@@ -33,7 +33,8 @@
 #include <linux/sched.h>
 #endif
 #include <trace/events/power.h>
-
+/* Macros to iterate over lists */
+/* Iterate over online CPUs policies */
 static LIST_HEAD(cpufreq_policy_list);
 
 static inline bool policy_is_inactive(struct cpufreq_policy *policy)
@@ -675,6 +676,8 @@ static ssize_t store_##file_name					\
 	if (!ret)							\
 		policy->user_policy.object = temp;			\
 									\
+	trace_cpufreq_policy_update(current, policy->min, policy->max);	\
+									\
 	return ret ? ret : count;					\
 }
 
@@ -688,9 +691,11 @@ static ssize_t show_cpuinfo_cur_freq(struct cpufreq_policy *policy,
 					char *buf)
 {
 	unsigned int cur_freq = __cpufreq_get(policy);
-	if (!cur_freq)
-		return sprintf(buf, "<unknown>");
-	return sprintf(buf, "%u\n", cur_freq);
+
+	if (cur_freq)
+		return sprintf(buf, "%u\n", cur_freq);
+
+	return sprintf(buf, "<unknown>\n");
 }
 
 /**
@@ -1246,6 +1251,9 @@ static int cpufreq_online(unsigned int cpu)
 		for_each_cpu(j, policy->related_cpus)
 			per_cpu(cpufreq_cpu_data, j) = policy;
 		write_unlock_irqrestore(&cpufreq_driver_lock, flags);
+	} else {
+		policy->min = policy->user_policy.min;
+		policy->max = policy->user_policy.max;
 	}
 
 	if (cpufreq_driver->get && !cpufreq_driver->setpolicy) {
@@ -1928,8 +1936,10 @@ int __cpufreq_driver_target(struct cpufreq_policy *policy,
 	 * exactly same freq is called again and so we can save on few function
 	 * calls.
 	 */
+#ifndef CONFIG_HISI_BIG_MAXFREQ_HOTPLUG
 	if (target_freq == policy->cur)
 		return 0;
+#endif
 
 	/* Save last value to restore later on errors */
 	policy->restore_freq = policy->cur;
@@ -1953,10 +1963,12 @@ int __cpufreq_driver_target(struct cpufreq_policy *policy,
 			goto out;
 		}
 
+#ifndef CONFIG_HISI_BIG_MAXFREQ_HOTPLUG
 		if (freq_table[index].frequency == policy->cur) {
 			retval = 0;
 			goto out;
 		}
+#endif
 
 		retval = __target_index(policy, freq_table, index);
 	}
@@ -2511,6 +2523,7 @@ int cpufreq_register_driver(struct cpufreq_driver *driver_data)
 	if (!(cpufreq_driver->flags & CPUFREQ_STICKY) &&
 	    list_empty(&cpufreq_policy_list)) {
 		/* if all ->init() calls failed, unregister */
+		ret = -ENODEV;
 		pr_debug("%s: No CPU initialized for driver %s\n", __func__,
 			 driver_data->name);
 		goto err_if_unreg;

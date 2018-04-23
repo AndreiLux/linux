@@ -1,5 +1,5 @@
 /*
- * drivers/power/process.c - Functions for starting/stopping processes on 
+ * drivers/power/process.c - Functions for starting/stopping processes on
  *                           suspend transitions.
  *
  * Originally from swsusp.
@@ -20,7 +20,7 @@
 #include <trace/events/power.h>
 #include <linux/wakeup_reason.h>
 
-/* 
+/*
  * Timeout for stopping processes
  */
 unsigned int __read_mostly freeze_timeout_msecs = 20 * MSEC_PER_SEC;
@@ -98,10 +98,18 @@ static int try_to_freeze_tasks(bool user_only)
 		       elapsed_msecs / 1000, elapsed_msecs % 1000);
 	} else if (todo) {
 		pr_cont("\n");
+#ifdef CONFIG_HW_PTM
+		pr_err("Freezing of tasks %s after %d.%03d seconds"
+		       " (%d tasks refusing to freeze, wq_busy=%d):\n",
+				wakeup ? "aborted" : "failed",
+				elapsed_msecs / 1000, elapsed_msecs % 1000,
+				todo - wq_busy, wq_busy);
+#else
 		pr_err("Freezing of tasks failed after %d.%03d seconds"
 		       " (%d tasks refusing to freeze, wq_busy=%d):\n",
 		       elapsed_msecs / 1000, elapsed_msecs % 1000,
 		       todo - wq_busy, wq_busy);
+#endif
 
 			read_lock(&tasklist_lock);
 			for_each_process_thread(g, p) {

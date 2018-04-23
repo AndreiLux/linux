@@ -42,6 +42,7 @@
 #include <linux/sched/sysctl.h>
 #include <linux/slab.h>
 #include <linux/compat.h>
+#include <linux/hisi/rdr_hisi_ap_hook.h>
 
 #include <asm/uaccess.h>
 #include <asm/unistd.h>
@@ -1175,7 +1176,13 @@ static void call_timer_fn(struct timer_list *timer, void (*fn)(unsigned long),
 	lock_map_acquire(&lockdep_map);
 
 	trace_timer_expire_entry(timer);
+#ifdef CONFIG_HISI_TIME_HOOK
+	time_hook((u64)fn, 0);
+#endif
 	fn(data);
+#ifdef CONFIG_HISI_TIME_HOOK
+	time_hook((u64)fn, 1);
+#endif
 	trace_timer_expire_exit(timer);
 
 	lock_map_release(&lockdep_map);

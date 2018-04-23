@@ -108,6 +108,15 @@
 	.endm
 
 /*
+ * NOP sequence
+ */
+	.macro	nops, num
+	.rept	\num
+	nop
+	.endr
+	.endm
+
+/*
  * Emit an entry into the exception table
  */
 	.macro		_asm_extable, from, to
@@ -376,6 +385,12 @@ alternative_endif
  */
 	.macro	get_thread_info, rd
 	mrs	\rd, sp_el0
+#ifdef CONFIG_HUAWEI_KERNEL_STACK_RANDOMIZE_STRONG
+	stp x23, x24, [sp, #-16]!
+	ldr_l   x23, kti_offset, x24
+	add \rd, \rd, x23
+	ldp x23, x24, [sp], #16
+#endif
 	.endm
 
 /*

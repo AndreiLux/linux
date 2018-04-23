@@ -59,8 +59,13 @@
 #include <linux/mutex.h>
 #include <linux/cgroup.h>
 #include <linux/wait.h>
+#include <linux/ioprio.h>
 
 struct static_key cpusets_enabled_key __read_mostly = STATIC_KEY_INIT_FALSE;
+
+#ifdef CONFIG_ROW_OPTIMIZATION
+int row_optimization_offon;
+#endif
 
 /* See "Frequency meter" comments, below. */
 
@@ -130,6 +135,11 @@ struct cpuset {
 
 	/* for custom sched domain */
 	int relax_domain_level;
+
+#ifdef CONFIG_ROW_OPTIMIZATION
+	/* for row io priority */
+	int ioprio;
+#endif
 };
 
 static inline struct cpuset *css_cs(struct cgroup_subsys_state *css)
@@ -174,9 +184,9 @@ typedef enum {
 } cpuset_flagbits_t;
 
 /* convenient tests for these bits */
-static inline bool is_cpuset_online(const struct cpuset *cs)
+static inline bool is_cpuset_online(struct cpuset *cs)
 {
-	return test_bit(CS_ONLINE, &cs->flags);
+	return test_bit(CS_ONLINE, &cs->flags) && !css_is_dying(&cs->css);
 }
 
 static inline int is_cpu_exclusive(const struct cpuset *cs)
@@ -1295,6 +1305,48 @@ static int update_relax_domain_level(struct cpuset *cs, s64 val)
 	return 0;
 }
 
+#ifdef CONFIG_ROW_OPTIMIZATION
+/**
+ * update_ioprio - update the ROW io priority of the cpuset.
+ * @cs: the cpuset in which the io priority needs to be changed
+ * @prio: the ROW io priority
+ *
+ * set the io priority, including RT---1 , BE---2, IDLE---3,
+ * according to the cpuset class
+ */
+static int update_ioprio(struct cpuset *cs, int prio)
+{
+	if (prio < 0 || prio > 3)
+		return -EINVAL;
+
+	if (prio != cs->ioprio)
+		cs->ioprio = prio;
+	return 0;
+}
+
+/**
+ * update_miss_ioprio - update the row io priority of the missed process
+ * @css: the root cgroup_subsys_state
+ *
+ * set the io prioiry according to the cpuset io priority
+ */
+static int update_pre_ioprio(struct cgroup_subsys_state *css, int row_offon)
+{
+	struct cpuset *cs = css_cs(css);
+	struct cgroup_subsys_state *next = css_next_descendant_pre(css, NULL);
+
+	while (next) {
+		cs = css_cs(next);
+		if (row_offon)
+			cgroup_update_ioprio(next, cs->ioprio);
+		else
+			cgroup_update_ioprio(next, IOPRIO_CLASS_BE);
+		next = css_next_descendant_pre(next, css);
+	}
+	return 0;
+}
+#endif
+
 /**
  * update_tasks_flags - update the spread flags of tasks in the cpuset.
  * @cs: the cpuset in which each task's spread flags needs to be changed
@@ -1533,7 +1585,11 @@ static void cpuset_attach(struct cgroup_taskset *tset)
 	struct cgroup_subsys_state *css;
 	struct cpuset *cs;
 	struct cpuset *oldcs = cpuset_attach_old_cs;
-
+#ifdef CONFIG_ROW_OPTIMIZATION
+	unsigned int cs_ioprio;
+	int ret = 0;
+	int ioprio_set;
+#endif
 	cgroup_taskset_first(tset, &css);
 	cs = css_cs(css);
 
@@ -1556,6 +1612,18 @@ static void cpuset_attach(struct cgroup_taskset *tset)
 
 		cpuset_change_task_nodemask(task, &cpuset_attach_nodemask_to);
 		cpuset_update_task_spread_flag(cs, task);
+#ifdef CONFIG_ROW_OPTIMIZATION
+		cs_ioprio = IOPRIO_CLASS_BE;
+		if (row_optimization_offon)
+			cs_ioprio = cs->ioprio;
+		if (cs_ioprio <= 3) {
+			ioprio_set = (int)(cs_ioprio << IOPRIO_CLASS_SHIFT);
+			ret = set_task_ioprio(task, ioprio_set);
+			if (ret)
+				pr_warn("row: set tid %d to priority %d failed",
+							task->pid, cs_ioprio);
+		}
+#endif
 	}
 
 	/*
@@ -1611,6 +1679,10 @@ typedef enum {
 	FILE_MEMORY_PRESSURE,
 	FILE_SPREAD_PAGE,
 	FILE_SPREAD_SLAB,
+#ifdef CONFIG_ROW_OPTIMIZATION
+	FILE_IOPRIO,
+	FILE_ROW_OPTIMIZATION_ENABLED,
+#endif
 } cpuset_filetype_t;
 
 static int cpuset_write_u64(struct cgroup_subsys_state *css, struct cftype *cft,
@@ -1645,6 +1717,12 @@ static int cpuset_write_u64(struct cgroup_subsys_state *css, struct cftype *cft,
 	case FILE_MEMORY_PRESSURE_ENABLED:
 		cpuset_memory_pressure_enabled = !!val;
 		break;
+#ifdef CONFIG_ROW_OPTIMIZATION
+	case FILE_ROW_OPTIMIZATION_ENABLED:
+		row_optimization_offon = !!val;
+		update_pre_ioprio(css, row_optimization_offon);
+		break;
+#endif
 	case FILE_SPREAD_PAGE:
 		retval = update_flag(CS_SPREAD_PAGE, cs, val);
 		break;
@@ -1675,6 +1753,12 @@ static int cpuset_write_s64(struct cgroup_subsys_state *css, struct cftype *cft,
 	case FILE_SCHED_RELAX_DOMAIN_LEVEL:
 		retval = update_relax_domain_level(cs, val);
 		break;
+#ifdef CONFIG_ROW_OPTIMIZATION
+	case FILE_IOPRIO:
+		retval = update_ioprio(cs, val);
+		update_pre_ioprio(css, row_optimization_offon);
+		break;
+#endif
 	default:
 		retval = -EINVAL;
 		break;
@@ -1804,6 +1888,10 @@ static u64 cpuset_read_u64(struct cgroup_subsys_state *css, struct cftype *cft)
 		return is_memory_migrate(cs);
 	case FILE_MEMORY_PRESSURE_ENABLED:
 		return cpuset_memory_pressure_enabled;
+#ifdef CONFIG_ROW_OPTIMIZATION
+	case FILE_ROW_OPTIMIZATION_ENABLED:
+		return row_optimization_offon;
+#endif
 	case FILE_MEMORY_PRESSURE:
 		return fmeter_getrate(&cs->fmeter);
 	case FILE_SPREAD_PAGE:
@@ -1825,6 +1913,10 @@ static s64 cpuset_read_s64(struct cgroup_subsys_state *css, struct cftype *cft)
 	switch (type) {
 	case FILE_SCHED_RELAX_DOMAIN_LEVEL:
 		return cs->relax_domain_level;
+#ifdef CONFIG_ROW_OPTIMIZATION
+	case FILE_IOPRIO:
+		return cs->ioprio;
+#endif
 	default:
 		BUG();
 	}
@@ -1935,6 +2027,23 @@ static struct cftype files[] = {
 		.write_u64 = cpuset_write_u64,
 		.private = FILE_MEMORY_PRESSURE_ENABLED,
 	},
+
+#ifdef CONFIG_ROW_OPTIMIZATION
+	{
+		.name = "ioprio",
+		.read_s64 = cpuset_read_s64,
+		.write_s64 = cpuset_write_s64,
+		.private = FILE_IOPRIO,
+	},
+
+	{
+		.name = "row_optimization_enabled",
+		.flags = CFTYPE_ONLY_ON_ROOT,
+		.read_u64 = cpuset_read_u64,
+		.write_u64 = cpuset_write_u64,
+		.private = FILE_ROW_OPTIMIZATION_ENABLED,
+	},
+#endif
 
 	{ }	/* terminate */
 };
@@ -2124,6 +2233,16 @@ void cpuset_fork(struct task_struct *task, void *priv)
 
 	set_cpus_allowed_ptr(task, &current->cpus_allowed);
 	task->mems_allowed = current->mems_allowed;
+#ifdef CONFIG_ROW_OPTIMIZATION
+	if (!row_optimization_offon) {
+		int ret = set_task_ioprio(task, IOPRIO_CLASS_BE <<
+					IOPRIO_CLASS_SHIFT);
+
+		if (ret)
+			pr_warn("row: set tid %d to priority %d failed",
+				task->pid, IOPRIO_CLASS_BE);
+	}
+#endif
 }
 
 struct cgroup_subsys cpuset_cgrp_subsys = {

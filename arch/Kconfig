@@ -254,6 +254,10 @@ config HAVE_HW_BREAKPOINT
 	bool
 	depends on PERF_EVENTS
 
+config HAVE_HW_BREAKPOINT_ADDR_MASK
+	bool
+	depends on HAVE_HW_BREAKPOINT
+
 config HAVE_MIXED_BREAKPOINTS_REGS
 	bool
 	depends on HAVE_HW_BREAKPOINT
@@ -640,5 +644,11 @@ config OLD_SIGACTION
 
 config COMPAT_OLD_SIGACTION
 	bool
+
+config MODULE_ENABLE_WITH_ENG
+	bool "Modules enable switch"
+	depends on MODULES
+	help
+	  Interface for disable "modules_disabled" by eng mode.
 
 source "kernel/gcov/Kconfig"

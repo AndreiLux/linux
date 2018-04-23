@@ -54,6 +54,11 @@
 #include <asm/processor.h>
 #include <asm/stacktrace.h>
 
+#ifdef CONFIG_HISI_BB
+#include <linux/hisi/rdr_hisi_platform.h>
+#include <linux/smp.h>
+#endif
+
 #ifdef CONFIG_CC_STACKPROTECTOR
 #include <linux/stackprotector.h>
 unsigned long __stack_chk_guard __read_mostly;
@@ -90,6 +95,12 @@ void arch_cpu_idle_dead(void)
 }
 #endif
 
+#ifdef CONFIG_CPU_FREQ_GOV_INTERACTIVE
+void arch_cpu_idle_exit(void)
+{
+	idle_notifier_call_chain((unsigned long)IDLE_END);
+}
+#endif
 /*
  * Called by kexec, immediately prior to machine_kexec().
  *
@@ -233,6 +244,9 @@ void __show_regs(struct pt_regs *regs)
 {
 	int i, top_reg;
 	u64 lr, sp;
+#ifdef CONFIG_HISI_BB
+	unsigned int mask = 0x1 << get_cpu();
+#endif
 
 	if (compat_user_mode(regs)) {
 		lr = regs->compat_lr;
@@ -256,8 +270,14 @@ void __show_regs(struct pt_regs *regs)
 			printk("\n");
 	}
 	if (!user_mode(regs))
-		show_extra_register_data(regs, 128);
+#ifdef CONFIG_HISI_BB
+		if (!(g_cpu_in_ipi_stop & mask))
+#endif
+			show_extra_register_data(regs, 128);
 	printk("\n");
+#ifdef CONFIG_HISI_BB
+	put_cpu();
+#endif
 }
 
 void show_regs(struct pt_regs * regs)

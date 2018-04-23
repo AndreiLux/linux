@@ -28,6 +28,10 @@
 
 #include "sync.h"
 
+#ifdef CONFIG_HW_ZEROHUNG
+#include <chipset_common/hwzrhung/zrhung.h>
+#endif
+
 #define CREATE_TRACE_POINTS
 #include "trace/sync.h"
 
@@ -368,6 +372,24 @@ int sync_fence_cancel_async(struct sync_fence *fence,
 }
 EXPORT_SYMBOL(sync_fence_cancel_async);
 
+#ifdef CONFIG_HW_ZEROHUNG
+void fencewp_report(long timeout, bool dump)
+{
+	if (dump == true) {
+		sync_dump();
+	}
+
+	if (sync_get_dump_buf()) {
+		zrhung_send_event(ZRHUNG_WP_FENCE, "K", sync_get_dump_buf());
+	} else {
+		char fence_buf[128] = {0};
+
+		snprintf(fence_buf, sizeof(fence_buf), "fence timeout after %dms\n", jiffies_to_msecs(timeout));
+		zrhung_send_event(ZRHUNG_WP_FENCE, "K", fence_buf);
+	}
+}
+#endif
+
 int sync_fence_wait(struct sync_fence *fence, long timeout)
 {
 	long ret;
@@ -393,6 +415,9 @@ int sync_fence_wait(struct sync_fence *fence, long timeout)
 			pr_info("fence timeout on [%p] after %dms\n", fence,
 				jiffies_to_msecs(timeout));
 			sync_dump();
+#ifdef CONFIG_HW_ZEROHUNG
+			fencewp_report(timeout, false);
+#endif
 		}
 		return -ETIME;
 	}

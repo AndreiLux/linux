@@ -127,6 +127,12 @@ config USB_GADGET_STORAGE_NUM_BUFFERS
 	   a module parameter as well.
 	   If unsure, say 2.
 
+config HISI_USB_FUNC_ADD_SS_DESC
+	boolean "USB Gadget functions support superspeed"
+	default y
+	help
+	  USB Gadget functions support superspeed.
+
 source "drivers/usb/gadget/udc/Kconfig"
 
 #
@@ -210,6 +216,19 @@ config USB_F_AUDIO_SRC
 
 config USB_F_ACC
 	tristate
+
+config USB_F_BALONG_ACM
+	tristate
+
+config USB_HW_F_ACM
+	tristate
+
+config USB_MASS_STORAGE_SUPPORT_MAC
+	bool "Mass Storage support MAC system"
+	depends on USB_F_MASS_STORAGE
+	help
+	  Mass Storage support MAC system.
+
 
 choice
 	tristate "USB Gadget Drivers"
@@ -500,6 +519,26 @@ config USB_CONFIGFS_F_PRINTER
 
 	  For more information, see Documentation/usb/gadget_printer.txt
 	  which includes sample code for accessing the device file.
+
+config USB_CONFIGFS_BALONG_ACM
+	bool "HUAWEI BALONG ACM function"
+	depends on USB_CONFIGFS
+	select USB_F_BALONG_ACM
+	help
+	  ACM function used for HUAWEI Modem.
+
+config USB_CONFIGFS_HW_ACM
+	bool "HUAWEI ACM function"
+	depends on USB_CONFIGFS
+	select USB_HW_F_ACM
+	help
+	  ACM function used for HUAWEI manufacture mode.
+
+config HISI_USB_CONFIGFS
+	bool "USB Gadget set up through configfs in Hisilicon platforms"
+	depends on USB_CONFIGFS
+	help
+	  USB Gadget set up through configfs in Hisilicon platforms.
 
 source "drivers/usb/gadget/legacy/Kconfig"
 

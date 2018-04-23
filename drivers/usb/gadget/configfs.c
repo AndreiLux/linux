@@ -5,9 +5,13 @@
 #include <linux/nls.h>
 #include <linux/usb/composite.h>
 #include <linux/usb/gadget_configfs.h>
+#include <linux/hisi/usb/hisi_usb.h>
 #include "configfs.h"
 #include "u_f.h"
 #include "u_os_desc.h"
+
+#include <chipset_common/hwusb/hw_usb_rwswitch.h>
+#include <chipset_common/hwusb/hw_usb_sync_host_time.h>
 
 #ifdef CONFIG_USB_CONFIGFS_UEVENT
 #include <linux/platform_device.h>
@@ -32,6 +36,11 @@ struct device *create_function_device(char *name)
 		return ERR_PTR(-EINVAL);
 }
 EXPORT_SYMBOL_GPL(create_function_device);
+#endif
+
+#ifdef CONFIG_HISI_USB_CONFIGFS
+void (*android_setup_complete)(struct usb_ep *ep,
+		struct usb_request *req);
 #endif
 
 int check_user_usb_string(const char *name,
@@ -91,6 +100,13 @@ struct gadget_info {
 	bool connected;
 	bool sw_connected;
 	struct work_struct work;
+
+	/* for usb cable unplugged while sys.usb.config=none */
+	struct notifier_block cable_disconnect_nb;
+
+#ifdef CONFIG_USB_CONFIGFS_NCM
+	struct work_struct mirrorlink_work;
+#endif
 	struct device *dev;
 #endif
 };
@@ -140,21 +156,28 @@ struct gadget_config_name {
 	struct list_head list;
 };
 
+#define MAX_USB_STRING_LEN	126
+#define MAX_USB_STRING_WITH_NULL_LEN	(MAX_USB_STRING_LEN+1)
+
 static int usb_string_copy(const char *s, char **s_copy)
 {
 	int ret;
 	char *str;
 	char *copy = *s_copy;
 	ret = strlen(s);
-	if (ret > 126)
+	if (ret > MAX_USB_STRING_LEN)
 		return -EOVERFLOW;
 
-	str = kstrdup(s, GFP_KERNEL);
-	if (!str)
-		return -ENOMEM;
+	if (copy) {
+		str = copy;
+	} else {
+		str = kmalloc(MAX_USB_STRING_WITH_NULL_LEN, GFP_KERNEL);
+		if (!str)
+			return -ENOMEM;
+	}
+	strncpy(str, s, MAX_USB_STRING_WITH_NULL_LEN);
 	if (str[ret - 1] == '\n')
 		str[ret - 1] = '\0';
-	kfree(copy);
 	*s_copy = str;
 	return 0;
 }
@@ -282,6 +305,10 @@ static int unregister_gadget(struct gadget_info *gi)
 	return 0;
 }
 
+#ifdef CONFIG_HISI_USB_CONFIGFS
+#include "configfs_unlink_funs.c"
+#endif
+
 static ssize_t gadget_dev_desc_UDC_store(struct config_item *item,
 		const char *page, size_t len)
 {
@@ -301,6 +328,9 @@ static ssize_t gadget_dev_desc_UDC_store(struct config_item *item,
 		ret = unregister_gadget(gi);
 		if (ret)
 			goto err;
+#ifdef CONFIG_HISI_USB_CONFIGFS
+		gadget_unlink_functions(gi);
+#endif
 	} else {
 		if (gi->udc_name) {
 			ret = -EBUSY;
@@ -425,15 +455,14 @@ static int config_usb_cfg_link(
 	}
 
 	f = usb_get_function(fi);
-	if (f == NULL) {
-		/* Are we trying to symlink PTP without MTP function? */
-		ret = -EINVAL; /* Invalid Configuration */
-		goto out;
-	}
 	if (IS_ERR(f)) {
 		ret = PTR_ERR(f);
 		goto out;
 	}
+#ifdef CONFIG_HISI_USB_CONFIGFS
+	fi->f = f;
+	pr_info("[%s] link %s\n", __func__, fi->f->name);
+#endif
 
 	/* stash the function until we bind it to the gadget */
 	list_add_tail(&f->list, &cfg->func_list);
@@ -471,6 +500,9 @@ static int config_usb_cfg_unlink(
 		if (f->fi == fi) {
 			list_del(&f->list);
 			usb_put_function(f);
+#ifdef CONFIG_HISI_USB_CONFIGFS
+			fi->f = NULL;
+#endif
 			mutex_unlock(&gi->lock);
 			return 0;
 		}
@@ -1251,9 +1283,13 @@ static void purge_configs_funcs(struct gadget_info *gi)
 
 		cfg = container_of(c, struct config_usb_cfg, c);
 
-		list_for_each_entry_safe(f, tmp, &c->functions, list) {
-
-			list_move_tail(&f->list, &cfg->func_list);
+		/*
+		 * Access c->functions inversely, otherwise the order of
+		 * functions on cfg->func_list will be changed when failed
+		 * to call usb_add_function in configfs_composite_bind.
+		 */
+		list_for_each_entry_safe_reverse(f, tmp, &c->functions, list) {
+			list_move(&f->list, &cfg->func_list);
 			if (f->unbind) {
 				dev_err(&gi->cdev.gadget->dev, "unbind function"
 						" '%s'/%p\n", f->name, f);
@@ -1262,6 +1298,7 @@ static void purge_configs_funcs(struct gadget_info *gi)
 		}
 		c->next_interface_id = 0;
 		memset(c->interface, 0, sizeof(c->interface));
+		c->superspeed_plus = 0;
 		c->superspeed = 0;
 		c->highspeed = 0;
 		c->fullspeed = 0;
@@ -1400,6 +1437,11 @@ static int configfs_composite_bind(struct usb_gadget *gadget,
 	}
 
 	usb_ep_autoconfig_reset(cdev->gadget);
+
+#ifdef CONFIG_HISI_USB_CONFIGFS
+	android_setup_complete = cdev->req->complete;
+#endif
+
 	return 0;
 
 err_purge_funcs:
@@ -1461,6 +1503,25 @@ static void android_work(struct work_struct *data)
 			gi->connected, gi->sw_connected, cdev->config);
 	}
 }
+
+#ifdef CONFIG_USB_CONFIGFS_NCM
+static void mirrorlink_work(struct work_struct *data)
+{
+	struct gadget_info *gi = container_of(data, struct gadget_info, mirrorlink_work);
+	struct usb_composite_dev *cdev = &gi->cdev;
+
+	char *mirrorlink_event[2] = { "MIRRORLINK=REQUESTED", NULL };
+
+	if (!cdev) {
+		pr_err("%s:the point cdev is NULL !\n", __func__);
+		return;
+	}
+
+	kobject_uevent_env(&android_device->kobj, KOBJ_CHANGE,
+			mirrorlink_event);
+	pr_info("%s: sent uevent %s\n", __func__, mirrorlink_event[0]);
+}
+#endif
 #endif
 
 static void configfs_composite_unbind(struct usb_gadget *gadget)
@@ -1476,11 +1537,56 @@ static void configfs_composite_unbind(struct usb_gadget *gadget)
 	kfree(otg_desc[0]);
 	otg_desc[0] = NULL;
 	purge_configs_funcs(gi);
+#ifdef CONFIG_HISI_USB_CONFIGFS
+	/* cdev->req will be used by functions and do not set setup_pending.
+	 * So, call usb_ep_dequeue regardless of setup_pending */
+	if (cdev->req)
+		usb_ep_dequeue(cdev->gadget->ep0, cdev->req);
+#endif
 	composite_dev_cleanup(cdev);
 	usb_ep_autoconfig_reset(cdev->gadget);
 	cdev->gadget = NULL;
 	set_gadget_data(gadget, NULL);
+#ifdef CONFIG_HISI_USB_CONFIGFS
+	cdev->req = NULL;
+	cdev->os_desc_req = NULL;
+#endif
 }
+
+#include "../../hwusb/hw_gadget/hw_controlrequest_handle.c"
+
+#ifdef CONFIG_USB_CONFIGFS_NCM
+static int mirrorlink_ctrlrequest(struct usb_composite_dev *cdev,
+				const struct usb_ctrlrequest *ctrl)
+{
+	struct gadget_info *gi = container_of(cdev, struct gadget_info, cdev);
+	int value = -EOPNOTSUPP;
+	u8 b_requestType = ctrl->bRequestType;
+	u8 b_request = ctrl->bRequest;
+	u16 w_length = le16_to_cpu(ctrl->wLength);
+
+	if (b_requestType == (USB_DIR_OUT | USB_TYPE_VENDOR)) {
+		if (b_request == 0xF0) {
+			pr_info("%s: get mirrorlink ctrlrequest\n", __func__);
+			schedule_work(&gi->mirrorlink_work);
+			value = 0;
+		}
+	}
+
+	/* respond with data transfer or status phase? */
+	if (value >= 0) {
+		int rc;
+
+		cdev->req->zero = value < w_length;
+		cdev->req->length = value;
+		rc = usb_ep_queue(cdev->gadget->ep0, cdev->req, GFP_ATOMIC);
+		if (rc < 0)
+			pr_info("ml_ctrlrequest: setup response queue error\n");
+	}
+
+	return value;
+}
+#endif
 
 #ifdef CONFIG_USB_CONFIGFS_UEVENT
 static int android_setup(struct usb_gadget *gadget,
@@ -1498,6 +1604,14 @@ static int android_setup(struct usb_gadget *gadget,
 		schedule_work(&gi->work);
 	}
 	spin_unlock_irqrestore(&cdev->lock, flags);
+
+#ifdef CONFIG_HISI_USB_CONFIGFS
+	cdev->req->zero = 0;
+	cdev->req->length = 0;
+	cdev->req->complete = android_setup_complete;
+	gadget->ep0->driver_data = cdev;
+#endif
+
 	list_for_each_entry(fi, &gi->available_func, cfs_list) {
 		if (fi != NULL && fi->f != NULL && fi->f->setup != NULL) {
 			value = fi->f->setup(fi->f, c);
@@ -1506,9 +1620,19 @@ static int android_setup(struct usb_gadget *gadget,
 		}
 	}
 
+#ifdef CONFIG_HW_GADGET
+	if (value < 0)
+		value = hw_ep0_handler(cdev, c);
+#endif
+
 #ifdef CONFIG_USB_CONFIGFS_F_ACC
 	if (value < 0)
 		value = acc_ctrlrequest(cdev, c);
+#endif
+
+#ifdef CONFIG_USB_CONFIGFS_NCM
+	if (value < 0)
+		value = mirrorlink_ctrlrequest(cdev, c);
 #endif
 
 	if (value < 0)
@@ -1529,6 +1653,12 @@ static void android_disconnect(struct usb_gadget *gadget)
 	struct usb_composite_dev        *cdev = get_gadget_data(gadget);
 	struct gadget_info *gi = container_of(cdev, struct gadget_info, cdev);
 
+	if (NULL == cdev) {
+		WARN(1, "%s: Calling disconnect in android_disconnect that is \
+			 not connected\n", __func__);
+		return;
+	}
+
 	/* accessory HID support can be active while the
 		accessory function is not actually enabled,
 		so we need to inform it when we are disconnected.
@@ -1538,7 +1668,12 @@ static void android_disconnect(struct usb_gadget *gadget)
 	acc_disconnect();
 #endif
 	gi->connected = 0;
-	schedule_work(&gi->work);
+
+#ifdef CONFIG_HISI_USB_CONFIGFS
+	if (!gadget->is_removing_driver)
+#endif
+		schedule_work(&gi->work);
+
 	composite_disconnect(gadget);
 }
 #endif
@@ -1599,12 +1734,42 @@ static struct device_attribute *android_usb_attributes[] = {
 	NULL
 };
 
+/* for usb cable unplugged while sys.usb.config=none */
+/*lint -save -e715 */
+static int cable_disconnect_fn(struct notifier_block *nb,
+			unsigned long action, void *data)
+{
+	/*lint -e{826} for container_of */
+	struct gadget_info *gi = container_of(nb, struct gadget_info,
+			cable_disconnect_nb);
+	if (CHARGER_TYPE_NONE == action && (gi->connected != gi->sw_connected)) {
+		schedule_work(&gi->work);
+	}
+
+	return 0;
+}
+/*lint -restore */
+
 static int android_device_create(struct gadget_info *gi)
 {
 	struct device_attribute **attrs;
 	struct device_attribute *attr;
+	int ret;
 
 	INIT_WORK(&gi->work, android_work);
+
+	/* for usb cable unplugged while sys.usb.config=none */
+	gi->cable_disconnect_nb.notifier_call = cable_disconnect_fn;
+	ret = hisi_charger_type_notifier_register(&gi->cable_disconnect_nb);
+	if (ret) {
+		pr_err("[%s] hisi_charger_type_notifier_register failed\n",
+				__func__);
+		gi->cable_disconnect_nb.notifier_call = NULL;
+	}
+
+#ifdef CONFIG_USB_CONFIGFS_NCM
+	INIT_WORK(&gi->mirrorlink_work, mirrorlink_work);
+#endif
 	android_device = device_create(android_class, NULL,
 				MKDEV(0, 0), NULL, "android0");
 	if (IS_ERR(android_device))
@@ -1624,13 +1789,31 @@ static int android_device_create(struct gadget_info *gi)
 		}
 	}
 
+#ifdef CONFIG_HW_GADGET
+	hw_usb_sync_host_time_init();
+	hw_rwswitch_create_device(android_device, android_class);
+	hw_usb_get_device(android_device);
+#endif
+
 	return 0;
 }
 
-static void android_device_destroy(void)
+static void android_device_destroy(struct gadget_info *gi)
 {
 	struct device_attribute **attrs;
 	struct device_attribute *attr;
+	int ret;
+
+	/* for usb cable unplugged while sys.usb.config=none */
+	if (gi->cable_disconnect_nb.notifier_call) {
+		ret = hisi_charger_type_notifier_unregister(
+				&gi->cable_disconnect_nb);
+		if (ret)
+			pr_err("[%s] hisi_charger_type_notifier_unregister failed\n",
+				__func__);
+
+		gi->cable_disconnect_nb.notifier_call = NULL;
+	}
 
 	attrs = android_usb_attributes;
 	while ((attr = *attrs++))
@@ -1643,7 +1826,7 @@ static inline int android_device_create(struct gadget_info *gi)
 	return 0;
 }
 
-static inline void android_device_destroy(void)
+static inline void android_device_destroy(struct gadget_info *gi)
 {
 }
 #endif
@@ -1709,8 +1892,9 @@ err:
 
 static void gadgets_drop(struct config_group *group, struct config_item *item)
 {
+	struct gadget_info *gi = to_gadget_info(item);
+	android_device_destroy(gi);
 	config_item_put(item);
-	android_device_destroy();
 }
 
 static struct configfs_group_operations gadgets_ops = {

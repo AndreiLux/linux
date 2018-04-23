@@ -20,6 +20,35 @@
 #include <linux/module.h>
 #include <linux/reboot.h>
 
+#include <linux/mtd/hisi_nve_interface.h>
+#include <linux/mtd/hisi_nve_number.h>
+#include <linux/delay.h>
+
+#if defined (CONFIG_HUAWEI_DSM)
+#include <linux/jiffies.h>
+#include <dsm/dsm_pub.h>
+#include <linux/ctype.h>
+
+static struct dsm_dev dm_dsm_dev = {
+      .name = "dsm_dm_verity",
+      .device_name = NULL,
+      .ic_name = NULL,
+      .module_name = NULL,
+      .fops = NULL,
+      .buff_size = 1024,
+};
+
+static unsigned long timeout;
+#define DSM_REPORT_INTERVAL      (1)
+
+static struct dsm_client *dm_dsm_dclient = NULL;
+
+#define DM_VERITY_MAX_PRINT_ERRS	20
+static unsigned long err_count;
+
+#define HASH_ERR_VALUE		1
+#endif
+
 #define DM_MSG_PREFIX			"verity"
 
 #define DM_VERITY_ENV_LENGTH		42
@@ -95,11 +124,13 @@ static sector_t verity_position_at_level(struct dm_verity *v, sector_t block,
 /*
  * Wrapper for crypto_shash_init, which handles verity salting.
  */
-static int verity_hash_init(struct dm_verity *v, struct shash_desc *desc)
+static int verity_hash_init(struct dm_verity *v, struct shash_desc *desc, u32 count)
 {
 	int r;
-
-	desc->tfm = v->tfm;
+	if (count)
+		desc->tfm = v->tfm_sha256;
+	else
+		desc->tfm = v->tfm_sha2ce;
 	desc->flags = CRYPTO_TFM_REQ_MAY_SLEEP;
 
 	r = crypto_shash_init(desc);
@@ -154,17 +185,34 @@ static int verity_hash_final(struct dm_verity *v, struct shash_desc *desc,
 	return r;
 }
 
-int verity_hash(struct dm_verity *v, struct shash_desc *desc,
-		const u8 *data, size_t len, u8 *digest)
+int verity_hash_sel_sha(struct dm_verity *v, struct shash_desc *desc,
+		const u8 *data, size_t len, u8 *digest, u32 count)
 {
 	int r;
 
-	r = verity_hash_init(v, desc);
+	r = verity_hash_init(v, desc,count);
 	if (unlikely(r < 0))
 		return r;
 
 	r = verity_hash_update(v, desc, data, len);
 	if (unlikely(r < 0))
+		return r;
+
+	return verity_hash_final(v, desc, digest);
+}
+
+
+int verity_hash(struct dm_verity *v, struct shash_desc *desc,
+		const u8 *data, size_t len, u8 *digest)
+{
+	int r;
+
+	r = verity_hash_init(v, desc, 0);
+	if (unlikely(r < 0))//lint !e730
+		return r;
+
+	r = verity_hash_update(v, desc, data, len);
+	if (unlikely(r < 0))//lint !e730
 		return r;
 
 	return verity_hash_final(v, desc, digest);
@@ -188,6 +236,146 @@ static void verity_hash_at_level(struct dm_verity *v, sector_t block, int level,
 		*offset = idx << (v->hash_dev_block_bits - v->hash_per_block_bits);
 }
 
+#if defined (CONFIG_HUAWEI_DSM)
+static void verity_dsm(struct dm_verity *v, enum verity_block_type type,
+			     unsigned long long block, int error_no)
+{
+	const char *type_str = "";
+
+	switch (type) {
+	case DM_VERITY_BLOCK_TYPE_DATA:
+		type_str = "data";
+		break;
+	case DM_VERITY_BLOCK_TYPE_METADATA:
+		type_str = "metadata";
+		break;
+	default:
+		BUG();
+	}
+
+	if (time_after(jiffies, timeout)) {
+		if (!dsm_client_ocuppy(dm_dsm_dclient)) {
+			dsm_client_record(dm_dsm_dclient, "%s: %s block %d is corrupted, dmd error num %d\n",
+				v->data_dev->name, type_str, block, error_no);
+			dsm_client_notify(dm_dsm_dclient, error_no);
+		}
+
+		timeout = jiffies + DSM_REPORT_INTERVAL*HZ;
+	}
+}
+
+static void print_block_data(unsigned long long blocknr, unsigned char *data_to_dump
+			, int start, int len)
+{
+	int i, j;
+	int bh_offset = (start / 16) * 16;
+	char row_data[17] = { 0, };
+	char row_hex[50] = { 0, };
+	char ch;
+
+	if (err_count >= DM_VERITY_MAX_PRINT_ERRS)
+		return;
+
+	err_count++;
+
+	printk(KERN_ERR " block error# : %llu, start offset(byte) : %d\n"
+				, blocknr, start);
+	printk(KERN_ERR "printing Hash dump %dbyte\n", len);
+	printk(KERN_ERR "-------------------------------------------------\n");
+
+	for (i = 0; i < (len + 15) / 16; i++) {
+		for (j = 0; j < 16; j++) {
+			ch = *(data_to_dump + bh_offset + j);
+			if (start <= bh_offset + j
+				&& start + len > bh_offset + j) {
+
+				if (isascii(ch) && isprint(ch))
+					sprintf(row_data + j, "%c", ch);
+				else
+					sprintf(row_data + j, ".");
+
+				sprintf(row_hex + (j * 3), "%2.2x ", ch);
+			} else {
+				sprintf(row_data + j, " ");
+				sprintf(row_hex + (j * 3), "-- ");
+			}
+		}
+
+		printk(KERN_ERR "0x%4.4x : %s | %s\n"
+				, bh_offset, row_hex, row_data);
+		bh_offset += 16;
+	}
+	printk(KERN_ERR "---------------------------------------------------\n");
+}
+#endif
+
+#if defined (CONFIG_DM_VERITY_HW_RETRY)
+
+#define DM_MAX_ERR_COUNT		4
+
+static int verity_write_nv(int value)
+{
+	struct hisi_nve_info_user nve;
+	int ret;
+
+	memset(&nve, 0, sizeof(nve));
+	strncpy(nve.nv_name, "VMODE", strlen("VMODE")+1);
+	nve.nv_number = NVE_VERIFY_MODE_NUM;
+	nve.valid_size = 1;
+	nve.nv_operation = NV_WRITE;
+	nve.nv_data[0] = (unsigned char)value;
+	ret = hisi_nve_direct_access(&nve);
+
+	return ret;
+}
+
+static int verity_read_nv(void)
+{
+	struct hisi_nve_info_user nve;
+	int ret;
+
+	memset(&nve, 0, sizeof(nve));
+	strncpy(nve.nv_name, "VMODE", strlen("VMODE")+1);
+	nve.nv_number = NVE_VERIFY_MODE_NUM;
+	nve.valid_size = 1;
+	nve.nv_operation = NV_READ;
+
+	ret = hisi_nve_direct_access(&nve);
+	if (ret) {
+		DMERR("read verify mode nve fail!");
+		return -1;
+	}
+
+	return (int)nve.nv_data[0];
+}
+
+
+static int write_hw_hash_err_nv(int value)
+{
+	struct hisi_nve_info_user nve;
+	int ret;
+
+	memset(&nve, 0, sizeof(nve));
+	strncpy(nve.nv_name, "HWHASH", strlen("HWHASH")+1);
+	nve.nv_number = NVE_HW_HASH_ERR_NUM;
+	nve.valid_size = 1;
+	nve.nv_operation = NV_WRITE;
+	nve.nv_data[0] = (unsigned char)value;
+	ret = hisi_nve_direct_access(&nve);
+
+	return ret;
+}
+
+extern int get_dsm_notify_flag(void);
+/* just make static checker happy */
+static void hard_hash_fail_verity_dsm(struct dm_verity *v, enum verity_block_type type,
+			     unsigned long long block, int error_no)
+{
+	if (get_dsm_notify_flag())
+		verity_dsm(v, type, block, error_no);
+}
+#endif
+
 /*
  * Handle verification errors.
  */
@@ -197,13 +385,14 @@ static int verity_handle_err(struct dm_verity *v, enum verity_block_type type,
 	char verity_env[DM_VERITY_ENV_LENGTH];
 	char *envp[] = { verity_env, NULL };
 	const char *type_str = "";
+	int ret = 1;
 	struct mapped_device *md = dm_table_get_md(v->ti->table);
 
 	/* Corruption should be visible in device status in all modes */
 	v->hash_failed = 1;
 
 	if (v->corrupted_errs >= DM_VERITY_MAX_CORRUPTED_ERRS)
-		goto out;
+		return 1;
 
 	v->corrupted_errs++;
 
@@ -229,14 +418,34 @@ static int verity_handle_err(struct dm_verity *v, enum verity_block_type type,
 
 	kobject_uevent_env(&disk_to_dev(dm_disk(md))->kobj, KOBJ_CHANGE, envp);
 
-out:
 	if (v->mode == DM_VERITY_MODE_LOGGING)
 		return 0;
 
-	if (v->mode == DM_VERITY_MODE_RESTART)
-		kernel_restart("dm-verity device corrupted");
+	if (v->mode == DM_VERITY_MODE_RESTART) {
+#if defined (CONFIG_DM_VERITY_HW_RETRY)
+		int value = verity_read_nv();
+		if (value < 0) {
+			printk(KERN_ERR "read verify mode nve fail!");
+			/* we need pay attention on this case */
+			return 0;
+		} else if (DM_MAX_ERR_COUNT == value)
+			return 1;
 
-	return 1;
+		if (v->verify_failed_flag == 0) {
+			if (value ++ >= DM_MAX_ERR_COUNT) {
+				value = DM_MAX_ERR_COUNT;
+			}
+			if (verity_write_nv(value))
+				printk(KERN_ERR "wirte verify mode nve fail!");
+
+			v->verify_failed_flag = 1;
+		}
+#endif
+		/*kernel_restart("dm-verity device corrupted");*/
+		return 0;
+	}
+
+	return ret;
 }
 
 /*
@@ -260,42 +469,84 @@ static int verity_verify_level(struct dm_verity *v, struct dm_verity_io *io,
 	int r;
 	sector_t hash_block;
 	unsigned offset;
+	/* for retry */
+	unsigned retry_count;
 
 	verity_hash_at_level(v, block, level, &hash_block, &offset);
 
 	data = dm_bufio_read(v->bufio, hash_block, &buf);
 	if (IS_ERR(data))
-		return PTR_ERR(data);
+		return (int)(PTR_ERR(data));
 
 	aux = dm_bufio_get_aux_data(buf);
 
-	if (!aux->hash_verified) {
+	if (!aux->hash_verified)
+	{
 		if (skip_unverified) {
 			r = 1;
 			goto release_ret_r;
 		}
 
-		r = verity_hash(v, verity_io_hash_desc(v, io),
+		retry_count = 0;
+
+LABEL:
+		r = verity_hash_sel_sha(v, verity_io_hash_desc(v, io),
 				data, 1 << v->hash_dev_block_bits,
-				verity_io_real_digest(v, io));
+				verity_io_real_digest(v, io), retry_count);
 		if (unlikely(r < 0))
 			goto release_ret_r;
 
 		if (likely(memcmp(verity_io_real_digest(v, io), want_digest,
-				  v->digest_size) == 0))
+				  v->digest_size) == 0)) {
 			aux->hash_verified = 1;
-		else if (verity_fec_decode(v, io,
-					   DM_VERITY_BLOCK_TYPE_METADATA,
-					   hash_block, data, NULL) == 0)
-			aux->hash_verified = 1;
-		else if (verity_handle_err(v,
-					   DM_VERITY_BLOCK_TYPE_METADATA,
+			if (retry_count != 0) {
+			/* DSM-DMD INFO, soft hash OK while first ce hard hash fail */
+#if defined (CONFIG_HUAWEI_DSM)
+				hard_hash_fail_verity_dsm(v, DM_VERITY_BLOCK_TYPE_METADATA, hash_block, DSM_DM_VERITY_CE_ERROR_NO);
+				write_hw_hash_err_nv(HASH_ERR_VALUE);
+#endif
+				pr_err("[hash dm verity] CE hash fail,soft hash OK. retry_count = %d\n", retry_count);
+			}
+			/* else ce hash success */
+		} else {
+			/* hash fail */
+			retry_count ++;
+			if (retry_count == 1)
+				goto LABEL;
+			else if (verity_fec_decode(v, io, DM_VERITY_BLOCK_TYPE_METADATA,
+					   hash_block, data, NULL) == 0) {
+				/* fec success */
+#if defined (CONFIG_HUAWEI_DSM)
+				verity_dsm(v, DM_VERITY_BLOCK_TYPE_METADATA,
+				hash_block, DSM_DM_VERITY_FEC_INFO_NO);
+#endif
+				aux->hash_verified = 1;
+				pr_err("[hash dm verity] both ce and soft hash fail ,fec correct success. retry_count = %d\n", retry_count);
+			} else if  (verity_handle_err(v,DM_VERITY_BLOCK_TYPE_METADATA,
 					   hash_block)) {
-			r = -EIO;
-			goto release_ret_r;
-		}
+				/* ce&soft hash fail, fec fail */
+#if defined (CONFIG_HUAWEI_DSM)
+				print_block_data((unsigned long long)hash_block,
+					(unsigned char *)verity_io_real_digest(v, io),
+					0, v->digest_size);
+				print_block_data((unsigned long long)hash_block,
+					(unsigned char *)want_digest,
+					0, v->digest_size);
+#endif
+#if defined (CONFIG_HUAWEI_DSM)
+				verity_dsm(v, DM_VERITY_BLOCK_TYPE_METADATA, hash_block, DSM_DM_VERITY_ERROR_NO);
+#endif
+				pr_err("[hash dm verity] both ce and soft hash fail ,fec fail. retry_count = %d\n", retry_count);
+				r = -EIO;
+				goto release_ret_r;
+			} else {
+				/* verity_handle_err success
+				   Attention - Important: Do we need a dsm alarm?
+				*/
+				pr_err("[hash dm verity] verity_handle_err success\n");
+			}
+		} /* end hash fail */
 	}
-
 	data += offset;
 	memcpy(want_digest, data, v->digest_size);
 	r = 0;
@@ -403,11 +654,19 @@ static int verity_verify_io(struct dm_verity_io *io)
 	struct dm_verity *v = io->v;
 	struct bvec_iter start;
 	unsigned b;
+	unsigned retry_count;
+
+	/*  for retry */
+	struct bvec_iter start2;
+	struct bvec_iter start_retry;
 
 	for (b = 0; b < io->n_blocks; b++) {
 		int r;
-		struct shash_desc *desc = verity_io_hash_desc(v, io);
 
+		struct shash_desc *desc = verity_io_hash_desc(v, io);
+		retry_count = 0;
+
+LABEL:
 		r = verity_hash_for_block(v, io, io->block + b,
 					  verity_io_want_digest(v, io),
 					  &is_zero);
@@ -427,12 +686,21 @@ static int verity_verify_io(struct dm_verity_io *io)
 			continue;
 		}
 
-		r = verity_hash_init(v, desc);
+		r = verity_hash_init(v, desc, retry_count);
 		if (unlikely(r < 0))
 			return r;
 
-		start = io->iter;
-		r = verity_for_bv_block(v, io, &io->iter, verity_bv_hash_update);
+		if (0 == retry_count) {
+			start = io->iter;
+			start_retry = start;		/*  for retry */
+			r = verity_for_bv_block(v, io, &io->iter, verity_bv_hash_update);
+		} else {
+			/* retry */
+			start = start_retry;
+			start2 = start_retry;
+			r = verity_for_bv_block(v, io, &start2, verity_bv_hash_update);
+		}
+
 		if (unlikely(r < 0))
 			return r;
 
@@ -441,14 +709,53 @@ static int verity_verify_io(struct dm_verity_io *io)
 			return r;
 
 		if (likely(memcmp(verity_io_real_digest(v, io),
-				  verity_io_want_digest(v, io), v->digest_size) == 0))
-			continue;
-		else if (verity_fec_decode(v, io, DM_VERITY_BLOCK_TYPE_DATA,
-					   io->block + b, NULL, &start) == 0)
-			continue;
-		else if (verity_handle_err(v, DM_VERITY_BLOCK_TYPE_DATA,
-					   io->block + b))
-			return -EIO;
+				  verity_io_want_digest(v, io), v->digest_size) == 0)) {
+				if (retry_count != 0) {
+					/* DSM-DMD INFO, soft hash OK while first ce hard hash fail */
+#if defined (CONFIG_HUAWEI_DSM)
+					hard_hash_fail_verity_dsm(v, DM_VERITY_BLOCK_TYPE_DATA, io->block + b, DSM_DM_VERITY_CE_ERROR_NO);
+					write_hw_hash_err_nv(HASH_ERR_VALUE);
+#endif
+					pr_err("CE hash fail,soft hash OK. retry_count = %d\n", retry_count);
+				}
+				/* else ce hash success */
+		} else {
+				/* hash fail */
+				retry_count ++;
+				if (retry_count == 1)
+					goto LABEL;
+				else if (verity_fec_decode(v, io, DM_VERITY_BLOCK_TYPE_DATA,
+					   io->block + b, NULL, &start) == 0){
+					/* fec success */
+#if defined (CONFIG_HUAWEI_DSM)
+					verity_dsm(v, DM_VERITY_BLOCK_TYPE_DATA,
+						io->block + b, DSM_DM_VERITY_FEC_INFO_NO);
+#endif
+					pr_err("[hash dm verity data] both ce and soft hash fail ,fec correct success. retry_count = %d\n", retry_count);
+				} else if (verity_handle_err(v, DM_VERITY_BLOCK_TYPE_DATA,
+					   io->block + b)) {
+				/* ce&soft hash fail, fec fail */
+#if defined (CONFIG_HUAWEI_DSM)
+				print_block_data((unsigned long long)(io->block+b),
+					(unsigned char *)verity_io_real_digest(v, io),
+					0, v->digest_size);
+				print_block_data((unsigned long long)(io->block+b),
+					(unsigned char *)verity_io_want_digest(v, io),
+					0, v->digest_size);
+#endif
+#if defined (CONFIG_HUAWEI_DSM)
+				verity_dsm(v, DM_VERITY_BLOCK_TYPE_DATA, io->block + b, DSM_DM_VERITY_ERROR_NO);
+#endif
+				pr_err("[hash dm verity data] both ce and soft hash fail ,fec fail. retry_count = %d\n", retry_count);
+				return -EIO;
+			} else {
+				/* verity_handle_err success
+				   Attention - Important: Do we need a dsm alarm?
+				*/
+				pr_err("[hash dm verity data] verity_handle_err success\n");
+			}
+		}
+
 	}
 
 	return 0;
@@ -618,7 +925,7 @@ void verity_status(struct dm_target *ti, status_type_t type,
 			1 << v->hash_dev_block_bits,
 			(unsigned long long)v->data_blocks,
 			(unsigned long long)v->hash_start,
-			v->alg_name
+			v->alg_name_sha2ce
 			);
 		for (x = 0; x < v->digest_size; x++)
 			DMEMIT("%02x", v->root_digest[x]);
@@ -709,10 +1016,13 @@ void verity_dtr(struct dm_target *ti)
 	kfree(v->root_digest);
 	kfree(v->zero_digest);
 
-	if (v->tfm)
-		crypto_free_shash(v->tfm);
+	if (v->tfm_sha2ce)
+		crypto_free_shash(v->tfm_sha2ce);
+	if (v->tfm_sha256)
+		crypto_free_shash(v->tfm_sha256);
 
-	kfree(v->alg_name);
+	kfree(v->alg_name_sha2ce);
+	kfree(v->alg_name_sha256);
 
 	if (v->hash_dev)
 		dm_put_device(ti, v->hash_dev);
@@ -842,6 +1152,10 @@ int verity_ctr(struct dm_target *ti, unsigned argc, char **argv)
 	ti->private = v;
 	v->ti = ti;
 
+#if defined (CONFIG_DM_VERITY_HW_RETRY)
+	v->verify_failed_flag = 0;
+#endif
+
 	r = verity_fec_ctr_alloc(v);
 	if (r)
 		goto bad;
@@ -922,28 +1236,44 @@ int verity_ctr(struct dm_target *ti, unsigned argc, char **argv)
 	}
 	v->hash_start = num_ll;
 
-	v->alg_name = kstrdup(argv[7], GFP_KERNEL);
-	if (!v->alg_name) {
+	v->alg_name_sha2ce = kstrdup(argv[7], GFP_KERNEL);
+	v->alg_name_sha256 = kstrdup(argv[7], GFP_KERNEL);
+	if ((NULL == v->alg_name_sha2ce) || (NULL == v->alg_name_sha256)) {
 		ti->error = "Cannot allocate algorithm name";
 		r = -ENOMEM;
 		goto bad;
 	}
 
-	v->tfm = crypto_alloc_shash(v->alg_name, 0, 0);
-	if (IS_ERR(v->tfm)) {
+#if defined(CONFIG_DM_HISI_SHA_USE_SOFT)
+	if (strncmp(v->alg_name_sha2ce, "sha256", strlen("sha256")+1) == 0) {
+		strncpy(v->alg_name_sha2ce,"sha2ce", strlen("sha2ce")+1);
+	}
+#endif
+
+	v->tfm_sha2ce = crypto_alloc_shash(v->alg_name_sha2ce, 0, 0);
+	if (IS_ERR(v->tfm_sha2ce)) {
 		ti->error = "Cannot initialize hash function";
-		r = PTR_ERR(v->tfm);
-		v->tfm = NULL;
+		r = PTR_ERR(v->tfm_sha2ce);
+		v->tfm_sha2ce = NULL;
 		goto bad;
 	}
-	v->digest_size = crypto_shash_digestsize(v->tfm);
+
+	v->tfm_sha256 = crypto_alloc_shash(v->alg_name_sha256, 0, 0);
+	if (IS_ERR(v->tfm_sha256)) {
+		ti->error = "Cannot initialize hash function";
+		r = (int)PTR_ERR(v->tfm_sha256);
+		v->tfm_sha256 = NULL;
+		goto bad;
+	}
+
+	v->digest_size = crypto_shash_digestsize(v->tfm_sha2ce);
 	if ((1 << v->hash_dev_block_bits) < v->digest_size * 2) {
 		ti->error = "Digest size too big";
 		r = -EINVAL;
 		goto bad;
 	}
 	v->shash_descsize =
-		sizeof(struct shash_desc) + crypto_shash_descsize(v->tfm);
+		sizeof(struct shash_desc) + crypto_shash_descsize(v->tfm_sha2ce);
 
 	v->root_digest = kmalloc(v->digest_size, GFP_KERNEL);
 	if (!v->root_digest) {
@@ -1081,6 +1411,17 @@ static int __init dm_verity_init(void)
 	r = dm_register_target(&verity_target);
 	if (r < 0)
 		DMERR("register failed %d", r);
+
+#if defined (CONFIG_HUAWEI_DSM)
+    if (!dm_dsm_dclient) {
+        dm_dsm_dclient = dsm_register_client(&dm_dsm_dev);
+		if (NULL == dm_dsm_dclient) {
+			DMERR("[%s]dsm_register_client register fail.\n", __func__);
+		}
+    }
+
+	timeout = jiffies;
+#endif
 
 	return r;
 }

@@ -23,6 +23,7 @@
 #include <linux/hardirq.h>
 #include <linux/init.h>
 #include <linux/ptrace.h>
+#include <linux/kprobes.h>
 #include <linux/stat.h>
 #include <linux/uaccess.h>
 
@@ -136,7 +137,8 @@ static int os_lock_notify(struct notifier_block *self,
 				    unsigned long action, void *data)
 {
 	int cpu = (unsigned long)data;
-	if ((action & ~CPU_TASKS_FROZEN) == CPU_ONLINE)
+	action &= ~CPU_TASKS_FROZEN;
+	if (action == CPU_ONLINE || action == CPU_STARTING)
 		smp_call_function_single(cpu, clear_os_lock, NULL, 1);
 	return NOTIFY_OK;
 }
@@ -253,6 +255,10 @@ static int single_step_handler(unsigned long addr, unsigned int esr,
 		 */
 		user_rewind_single_step(current);
 	} else {
+#ifdef	CONFIG_KPROBES
+		if (kprobe_single_step_handler(regs, esr) == DBG_HOOK_HANDLED)
+			return 0;
+#endif
 		if (call_step_hook(regs, esr) == DBG_HOOK_HANDLED)
 			return 0;
 
@@ -318,8 +324,15 @@ static int brk_handler(unsigned long addr, unsigned int esr,
 		};
 
 		force_sig_info(SIGTRAP, &info, current);
-	} else if (call_break_hook(regs, esr) != DBG_HOOK_HANDLED) {
-		pr_warning("Unexpected kernel BRK exception at EL1\n");
+	}
+#ifdef	CONFIG_KPROBES
+	else if ((esr & BRK64_ESR_MASK) == BRK64_ESR_KPROBES) {
+		if (kprobe_breakpoint_handler(regs, esr) != DBG_HOOK_HANDLED)
+			return -EFAULT;
+	}
+#endif
+	else if (call_break_hook(regs, esr) != DBG_HOOK_HANDLED) {
+		pr_warn("Unexpected kernel BRK exception at EL1\n");
 		return -EFAULT;
 	}
 

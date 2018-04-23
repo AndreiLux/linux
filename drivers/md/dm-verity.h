@@ -36,8 +36,10 @@ struct dm_verity {
 	struct dm_dev *hash_dev;
 	struct dm_target *ti;
 	struct dm_bufio_client *bufio;
-	char *alg_name;
-	struct crypto_shash *tfm;
+	char *alg_name_sha2ce;
+	char *alg_name_sha256;
+	struct crypto_shash *tfm_sha2ce;
+	struct crypto_shash *tfm_sha256;
 	u8 *root_digest;	/* digest of the root block */
 	u8 *salt;		/* salt: its size is salt_size */
 	u8 *zero_digest;	/* digest for a zero block */
@@ -63,6 +65,10 @@ struct dm_verity {
 	sector_t hash_level_block[DM_VERITY_MAX_LEVELS];
 
 	struct dm_verity_fec *fec;	/* forward error correction */
+
+#if defined (CONFIG_DM_VERITY_HW_RETRY)
+	int verify_failed_flag;
+#endif
 };
 
 struct dm_verity_io {
