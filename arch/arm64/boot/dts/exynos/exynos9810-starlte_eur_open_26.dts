@@ -7879,22 +7879,18 @@
    shared-cpus = "0-3";
 
    boost_table = < 0 >;
-   boost_table2 = < 30 598000 20 715000 15 832000 10 949000 5 1053000 0 >;
    up_rate_limit_table = < 0 >;
-   down_rate_limit_table = < 8000 >;
-   upscale_ratio_table = < 70 >;
-   upscale_ratio_table2 = < 140 598000 90 >;
-   upscale_ratio_table3 = < 140 598000 130 715000 120 832000 110 949000 100 1053000 90 1248000 90 1456000 90 1690000 90 1794000 90 >;
+   down_rate_limit_table = < 0 >;
+   upscale_ratio_table = < 80 1248000 90 1456000 95>;
   };
   domain@1 {
    device_type = "freqvar-tune";
    shared-cpus = "4-7";
 
    boost_table = < 0 >;
-   boost_table2 = < 20 858000 15 962000 5 1261000 0 >;
-   up_rate_limit_table = < 500 >;
+   up_rate_limit_table = < 8000 >;
    down_rate_limit_table = < 2500 >;
-   upscale_ratio_table = < 80 >;
+   upscale_ratio_table = < 80 1261000 90>;
   };
  };
 
@@ -7993,7 +7989,7 @@
 
    min-freq = <962000>;
    max-freq = <2314000>;
-   policy-max = <2314000>;
+   policy-max = <1794000>;
 
 
    pm_qos-min-class = <5>;
@@ -8013,7 +8009,7 @@
         2704000 1794000
         2652000 1794000
         2496000 1794000
-        2314000 1794000
+        2314000 1539000
         2158000 1539000
         2002000 1539000
         1924000 1539000
@@ -13234,10 +13230,10 @@ samsung,tmu_sensor_type = <0x8>;
   fuelgauge,sw_v_empty_voltage = <3200>;
   fuelgauge,sw_v_empty_voltage_cisd = <3100>;
   fuelgauge,sw_v_empty_recover_voltage = <3480>;
-  fuelgauge,qrtable20 = <0x0A0C>;
-  fuelgauge,qrtable30 = <0x0889>;
+  fuelgauge,qrtable20 = <0x0D80>;
+  fuelgauge,qrtable30 = <0x0D00>;
   fuelgauge,fg_resistor = <2>;
-  fuelgauge,capacity = <0x0B1D>;
+  fuelgauge,capacity = <0x0BB8>;
 
   fuelgauge,discharge_temp_threshold = <600>;
   fuelgauge,discharge_volt_threshold = <4200>;
