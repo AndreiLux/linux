@@ -5,7 +5,9 @@
 #include <linux/printk.h>
 #include <linux/rcupdate.h>
 #include <linux/slab.h>
+#ifdef CONFIG_SCHED_EHMP
 #include <linux/ehmp.h>
+#endif
 
 #include <trace/events/sched.h>
 
@@ -21,12 +23,14 @@ unsigned int sysctl_sched_cfs_boost __read_mostly;
 extern struct reciprocal_value schedtune_spc_rdiv;
 extern struct target_nrg schedtune_target_nrg;
 
+#ifdef CONFIG_SCHED_EHMP
 static int perf_threshold = 0;
 
 int schedtune_perf_threshold(void)
 {
 	return perf_threshold + 1;
 }
+#endif
 
 /* Performance Boost region (B) threshold params */
 static int perf_boost_idx;
@@ -1411,7 +1415,9 @@ schedtune_init(void)
 
 	schedtune_spc_rdiv = reciprocal_value(100);
 
+#ifdef CONFIG_SCHED_EHMP
 	perf_threshold = find_second_max_cap();
+#endif
 
 	return 0;
 

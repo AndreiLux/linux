@@ -31,8 +31,9 @@
 #include <linux/migrate.h>
 #include <linux/task_work.h>
 #include <linux/module.h>
+#ifdef CONFIG_SCHED_EHMP
 #include <linux/ehmp.h>
-
+#endif
 #include <trace/events/sched.h>
 
 #include <soc/samsung/exynos-cpu_hotplug.h>
@@ -771,8 +772,10 @@ void init_entity_runnable_average(struct sched_entity *se)
 	sa->util_sum = 0;
 	/* when this task enqueue'ed, it will contribute to its cfs_rq's load_avg */
 
-	if (sched_feat(EXYNOS_HMP_OM))
+#ifdef CONFIG_SCHED_EHMP
+	if (sched_feat(EHMP_OM))
 		ontime_new_entity_load(current, se);
+#endif
 }
 
 static inline u64 cfs_rq_clock_task(struct cfs_rq *cfs_rq);
@@ -809,10 +812,12 @@ void post_init_entity_util_avg(struct sched_entity *se)
 	struct sched_avg *sa = &se->avg;
 	long cap = (long)(SCHED_CAPACITY_SCALE - cfs_rq->avg.util_avg) / 2;
 
-	if (sched_feat(EXYNOS_HMP)) {
+#ifdef CONFIG_SCHED_EHMP
+	if (sched_feat(EHMP_EU)) {
 		exynos_init_entity_util_avg(se);
 		return;
 	}
+#endif
 
 	if (cap > 0) {
 		if (cfs_rq->avg.util_avg != 0) {
@@ -3383,8 +3388,10 @@ static inline void update_load_avg(struct sched_entity *se, int flags)
 		ptr = (void *)&(task_of(se)->ravg);
 #endif
 		trace_sched_load_avg_task(task_of(se), &se->avg, ptr);
-		if (sched_feat(EXYNOS_HMP_OM))
+#ifdef CONFIG_SCHED_EHMP
+		if (sched_feat(EHMP_OM))
 			ontime_trace_task_info(task_of(se));
+#endif
 	}
 }
 
@@ -3523,7 +3530,7 @@ static inline unsigned long cfs_rq_load_avg(struct cfs_rq *cfs_rq)
 static int idle_balance(struct rq *this_rq);
 
 
-static inline unsigned long task_util(struct task_struct *p)
+inline unsigned long task_util(struct task_struct *p)
 {
 #ifdef CONFIG_SCHED_WALT
 	if (!walt_disabled && sysctl_sched_use_walt_task_util) {
@@ -5892,7 +5899,7 @@ static inline bool cpu_in_sg(struct sched_group *sg, int cpu)
 	return cpu != -1 && cpumask_test_cpu(cpu, sched_group_cpus(sg));
 }
 
-static inline unsigned long task_util(struct task_struct *p);
+inline unsigned long task_util(struct task_struct *p);
 
 /*
  * energy_diff(): Estimate the energy impact of changing the utilization
@@ -7332,13 +7339,16 @@ select_task_rq_fair(struct task_struct *p, int prev_cpu, int sd_flag, int wake_f
 			cpumask_test_cpu(cpu, tsk_cpus_allowed(p)));
 	}
 
-	if (sched_feat(EXYNOS_HMP)) {
+#ifdef CONFIG_SCHED_EHMP
+	if (sched_feat(EHMP_LB)) {
 		int selected_cpu;
 
 		selected_cpu = exynos_select_cpu(p, prev_cpu, sync, sd_flag);
 		if (selected_cpu >= 0)
 			return selected_cpu;
-	} else if (energy_aware() && !(cpu_rq(prev_cpu)->rd->overutilized))
+	} else 
+#endif
+	if (energy_aware() && !(cpu_rq(prev_cpu)->rd->overutilized))
 		return select_energy_cpu_brute(p, prev_cpu, sync);
 
 	rcu_read_lock();
@@ -8084,8 +8094,12 @@ int can_migrate_task(struct task_struct *p, struct lb_env *env)
 	 */
 #ifdef CONFIG_CGROUP_SCHEDTUNE
 	if (smaller_cpu_capacity(env->dst_cpu, env->src_cpu) &&
-	    (schedtune_prefer_perf(p) ||
-	     (sched_feat(EXYNOS_HMP_OM) && !ontime_can_migration(p, env->dst_cpu))))
+	    (schedtune_prefer_perf(p) 
+#ifdef CONFIG_SCHED_EHMP
+		|| (sched_feat(EHMP_OM) && !ontime_can_migration(p, env->dst_cpu))))
+#else
+		))
+#endif
 		return 0;
 #endif
 
@@ -8558,7 +8572,9 @@ static void update_cpu_capacity(struct sched_domain *sd, int cpu)
 
 	cpu_rq(cpu)->cpu_capacity_orig = capacity;
 	cpu_rq(cpu)->cpu_capacity_margin = capacity + (capacity >> 2);
+#ifdef CONFIG_SCHED_EHMP
 	ehmp_update_overutilized(cpu, capacity);
+#endif
 
 	mcc = &cpu_rq(cpu)->rd->max_cpu_capacity;
 
@@ -8570,7 +8586,9 @@ static void update_cpu_capacity(struct sched_domain *sd, int cpu)
 	    (max_capacity < capacity)) {
 		mcc->val = capacity;
 		mcc->cpu = cpu;
+#ifdef CONFIG_SCHED_EHMP
 		ehmp_update_max_cpu_capacity(cpu, capacity);
+#endif
 #ifdef CONFIG_SCHED_DEBUG
 		raw_spin_unlock_irqrestore(&mcc->lock, flags);
 		pr_debug(KERN_DEBUG "CPU%d: update max cpu_capacity %lu\n",
@@ -9347,9 +9365,11 @@ static struct sched_group *find_busiest_group(struct lb_env *env)
 	 */
 	update_sd_lb_stats(env, &sds);
 
-	if (sched_feat(EXYNOS_HMP))
+#ifdef CONFIG_SCHED_EHMP
+	if (sched_feat(EHMP_LB))
 		skip_lb = !ehmp_trigger_lb(env->src_cpu, env->dst_cpu);
 	else
+#endif
 		skip_lb = energy_aware() && !env->dst_rq->rd->overutilized;
 
 	if (skip_lb)
@@ -9531,9 +9551,11 @@ static int need_active_balance(struct lb_env *env)
 		if ((sd->flags & SD_ASYM_PACKING) && env->src_cpu > env->dst_cpu)
 			return 1;
 	}
-
-	if (sched_feat(EXYNOS_HMP))
+	
+#ifdef CONFIG_SCHED_EHMP
+	if (sched_feat(EHMP_AB))
 		return exynos_need_active_balance(env->idle, sd, env->src_cpu, env->dst_cpu);
+#endif
 
 	/*
 	 * The dst_cpu is idle and the src_cpu CPU has only 1 CFS task.
@@ -10504,8 +10526,10 @@ static __latent_entropy void run_rebalance_domains(struct softirq_action *h)
 	nohz_idle_balance(this_rq, idle);
 	rebalance_domains(this_rq, idle);
 
-	if (sched_feat(EXYNOS_HMP_OM))
+#ifdef CONFIG_SCHED_EHMP
+	if (sched_feat(EHMP_OM))
 		ontime_migration();
+#endif
 	schedtune_group_util_update();
 }
 

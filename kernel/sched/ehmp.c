@@ -17,7 +17,8 @@
 #include "sched.h"
 #include "tune.h"
 
-unsigned long task_util(struct task_struct *p)
+extern unsigned long task_util(struct task_struct *p);
+unsigned long task_util2(struct task_struct *p)
 {
 #ifdef CONFIG_SCHED_WALT
 	if (!walt_disabled && sysctl_sched_use_walt_task_util) {
