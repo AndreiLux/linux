@@ -1,5 +1,5 @@
 /*
- * linux/drivers/video/fbdev/exynos/panel/s6e3ha8/s6e3ha8_star_a3_s0_panel_mdnie.h
+ * linux/drivers/video/fbdev/exynos/panel/s6e3ha8/s6e3ha8_star_a3_s1_panel_mdnie.h
  *
  * Header file for mDNIe Driver
  *
@@ -10,60 +10,60 @@
  * published by the Free Software Foundation.
  */
 
-#ifndef __S6E3HA8_STAR_A3_S0_PANEL_MDNIE_H__
-#define __S6E3HA8_STAR_A3_S0_PANEL_MDNIE_H__
+#ifndef __S6E3HA8_STAR_A3_S1_PANEL_MDNIE_H__
+#define __S6E3HA8_STAR_A3_S1_PANEL_MDNIE_H__
 
 #include "../panel.h"
 #include "../mdnie.h"
-#include "s6e3ha8_star_a3_s0_panel.h"
+#include "s6e3ha8_star_a3_s1_panel.h"
 
-#define S6E3HA8_STAR_A3_S0_LINE_0_NUM	(-101)
-#define S6E3HA8_STAR_A3_S0_LINE_0_DEN	(94)
-#define S6E3HA8_STAR_A3_S0_LINE_0_CON	(28)
+#define S6E3HA8_STAR_A3_S1_LINE_0_NUM	(-101)
+#define S6E3HA8_STAR_A3_S1_LINE_0_DEN	(94)
+#define S6E3HA8_STAR_A3_S1_LINE_0_CON	(28)
 
-#define S6E3HA8_STAR_A3_S0_LINE_1_NUM	(106)
-#define S6E3HA8_STAR_A3_S0_LINE_1_DEN	(29)
-#define S6E3HA8_STAR_A3_S0_LINE_1_CON	(-14083)
+#define S6E3HA8_STAR_A3_S1_LINE_1_NUM	(106)
+#define S6E3HA8_STAR_A3_S1_LINE_1_DEN	(29)
+#define S6E3HA8_STAR_A3_S1_LINE_1_CON	(-14083)
 
-#define S6E3HA8_STAR_A3_S0_COEFF_Q1_A	(85850)
-#define S6E3HA8_STAR_A3_S0_COEFF_Q1_B	(68462)
-#define S6E3HA8_STAR_A3_S0_COEFF_Q1_C	(-22016)
-#define S6E3HA8_STAR_A3_S0_COEFF_Q1_D	(-26984)
-#define S6E3HA8_STAR_A3_S0_COEFF_Q1_E	(4268)
-#define S6E3HA8_STAR_A3_S0_COEFF_Q1_F	(34523)
-#define S6E3HA8_STAR_A3_S0_COEFF_Q1_G	(-6545)
-#define S6E3HA8_STAR_A3_S0_COEFF_Q1_H	(-6185)
+#define S6E3HA8_STAR_A3_S1_COEFF_Q1_A	(85850)
+#define S6E3HA8_STAR_A3_S1_COEFF_Q1_B	(68462)
+#define S6E3HA8_STAR_A3_S1_COEFF_Q1_C	(-22016)
+#define S6E3HA8_STAR_A3_S1_COEFF_Q1_D	(-26984)
+#define S6E3HA8_STAR_A3_S1_COEFF_Q1_E	(4268)
+#define S6E3HA8_STAR_A3_S1_COEFF_Q1_F	(34523)
+#define S6E3HA8_STAR_A3_S1_COEFF_Q1_G	(-6545)
+#define S6E3HA8_STAR_A3_S1_COEFF_Q1_H	(-6185)
 
-#define S6E3HA8_STAR_A3_S0_COEFF_Q2_A	(-108292)
-#define S6E3HA8_STAR_A3_S0_COEFF_Q2_B	(-89259)
-#define S6E3HA8_STAR_A3_S0_COEFF_Q2_C	(29166)
-#define S6E3HA8_STAR_A3_S0_COEFF_Q2_D	(33669)
-#define S6E3HA8_STAR_A3_S0_COEFF_Q2_E	(-22116)
-#define S6E3HA8_STAR_A3_S0_COEFF_Q2_F	(10322)
-#define S6E3HA8_STAR_A3_S0_COEFF_Q2_G	(1741)
-#define S6E3HA8_STAR_A3_S0_COEFF_Q2_H	(1705)
+#define S6E3HA8_STAR_A3_S1_COEFF_Q2_A	(-108292)
+#define S6E3HA8_STAR_A3_S1_COEFF_Q2_B	(-89259)
+#define S6E3HA8_STAR_A3_S1_COEFF_Q2_C	(29166)
+#define S6E3HA8_STAR_A3_S1_COEFF_Q2_D	(33669)
+#define S6E3HA8_STAR_A3_S1_COEFF_Q2_E	(-22116)
+#define S6E3HA8_STAR_A3_S1_COEFF_Q2_F	(10322)
+#define S6E3HA8_STAR_A3_S1_COEFF_Q2_G	(1741)
+#define S6E3HA8_STAR_A3_S1_COEFF_Q2_H	(1705)
 
-#define S6E3HA8_STAR_A3_S0_COEFF_Q3_A    (-89731)
-#define S6E3HA8_STAR_A3_S0_COEFF_Q3_B    (-73367)
-#define S6E3HA8_STAR_A3_S0_COEFF_Q3_C    (23408)
-#define S6E3HA8_STAR_A3_S0_COEFF_Q3_D    (28412)
-#define S6E3HA8_STAR_A3_S0_COEFF_Q3_E    (-44813)
-#define S6E3HA8_STAR_A3_S0_COEFF_Q3_F    (-73586)
-#define S6E3HA8_STAR_A3_S0_COEFF_Q3_G    (20064)
-#define S6E3HA8_STAR_A3_S0_COEFF_Q3_H    (18179)
+#define S6E3HA8_STAR_A3_S1_COEFF_Q3_A    (-89731)
+#define S6E3HA8_STAR_A3_S1_COEFF_Q3_B    (-73367)
+#define S6E3HA8_STAR_A3_S1_COEFF_Q3_C    (23408)
+#define S6E3HA8_STAR_A3_S1_COEFF_Q3_D    (28412)
+#define S6E3HA8_STAR_A3_S1_COEFF_Q3_E    (-44813)
+#define S6E3HA8_STAR_A3_S1_COEFF_Q3_F    (-73586)
+#define S6E3HA8_STAR_A3_S1_COEFF_Q3_G    (20064)
+#define S6E3HA8_STAR_A3_S1_COEFF_Q3_H    (18179)
 
-#define S6E3HA8_STAR_A3_S0_COEFF_Q4_A    (86820)
-#define S6E3HA8_STAR_A3_S0_COEFF_Q4_B    (70834)
-#define S6E3HA8_STAR_A3_S0_COEFF_Q4_C    (-22574)
-#define S6E3HA8_STAR_A3_S0_COEFF_Q4_D    (-27511)
-#define S6E3HA8_STAR_A3_S0_COEFF_Q4_E    (19251)
-#define S6E3HA8_STAR_A3_S0_COEFF_Q4_F    (-12295)
-#define S6E3HA8_STAR_A3_S0_COEFF_Q4_G    (-996)
-#define S6E3HA8_STAR_A3_S0_COEFF_Q4_H    (-913)
+#define S6E3HA8_STAR_A3_S1_COEFF_Q4_A    (86820)
+#define S6E3HA8_STAR_A3_S1_COEFF_Q4_B    (70834)
+#define S6E3HA8_STAR_A3_S1_COEFF_Q4_C    (-22574)
+#define S6E3HA8_STAR_A3_S1_COEFF_Q4_D    (-27511)
+#define S6E3HA8_STAR_A3_S1_COEFF_Q4_E    (19251)
+#define S6E3HA8_STAR_A3_S1_COEFF_Q4_F    (-12295)
+#define S6E3HA8_STAR_A3_S1_COEFF_Q4_G    (-996)
+#define S6E3HA8_STAR_A3_S1_COEFF_Q4_H    (-913)
 
 /* ############################################# XXX_MODE ############################################# */
 /*
-static unsigned char star_a3_s0_mdnie_xxx_table[MODE_MAX][S6E3HA8_MDNIE_LEN] = {
+static unsigned char star_a3_s1_mdnie_xxx_table[MODE_MAX][S6E3HA8_MDNIE_LEN] = {
 	[DYNAMIC] = {
 	},
 	[STANDARD] = {
@@ -79,7 +79,7 @@ static unsigned char star_a3_s0_mdnie_xxx_table[MODE_MAX][S6E3HA8_MDNIE_LEN] = {
 
 /* ############################################# XXX_MODE ############################################# */
 /*
-static unsigned char star_a3_s0_mdnie_xxx_table[S6E3HA8_MDNIE_LEN] = {
+static unsigned char star_a3_s1_mdnie_xxx_table[S6E3HA8_MDNIE_LEN] = {
 };
  */
 
@@ -89,7 +89,7 @@ static unsigned char star_a3_s0_mdnie_xxx_table[S6E3HA8_MDNIE_LEN] = {
 /* #################################################################################################### */
 
 /* ############################################# UI_MODE ############################################# */
-static unsigned char star_a3_s0_mdnie_ui_table[MODE_MAX][S6E3HA8_MDNIE_LEN] = {
+static unsigned char star_a3_s1_mdnie_ui_table[MODE_MAX][S6E3HA8_MDNIE_LEN] = {
 	[DYNAMIC] = {
 		/* DFh */
 		0x11,	0x6a,	0x9a,	0x25,	0x1a,	0x16,	0x2a,	0x00,	0x37,	0x5a,	0x00,	0x4e,	0xc5,	0x00,	0x5d,	0x17,
@@ -187,7 +187,7 @@ static unsigned char star_a3_s0_mdnie_ui_table[MODE_MAX][S6E3HA8_MDNIE_LEN] = {
 };
 
 /* ############################################# VIDEO_NORMAL_MODE ############################################# */
-static unsigned char star_a3_s0_mdnie_video_table[MODE_MAX][S6E3HA8_MDNIE_LEN] = {
+static unsigned char star_a3_s1_mdnie_video_table[MODE_MAX][S6E3HA8_MDNIE_LEN] = {
 	[DYNAMIC] = {
 		/* DFh */
 		0x11,	0x6a,	0x9a,	0x25,	0x1a,	0x16,	0x2a,	0x00,	0x37,	0x5a,	0x00,	0x4e,	0xc5,	0x00,	0x5d,	0x17,
@@ -285,7 +285,7 @@ static unsigned char star_a3_s0_mdnie_video_table[MODE_MAX][S6E3HA8_MDNIE_LEN] =
 };
 
 /* ############################################# CAMERA_MODE ############################################# */
-static unsigned char star_a3_s0_mdnie_camera_table[MODE_MAX][S6E3HA8_MDNIE_LEN] = {
+static unsigned char star_a3_s1_mdnie_camera_table[MODE_MAX][S6E3HA8_MDNIE_LEN] = {
 	[DYNAMIC] = {
 		/* DFh */
 		0x11,	0x6a,	0x9a,	0x25,	0x1a,	0x16,	0x2a,	0x00,	0x37,	0x5a,	0x00,	0x4e,	0xc5,	0x00,	0x5d,	0x17,
@@ -383,7 +383,7 @@ static unsigned char star_a3_s0_mdnie_camera_table[MODE_MAX][S6E3HA8_MDNIE_LEN] 
 };
 
 /* ############################################# GALLERY_MODE ############################################# */
-static unsigned char star_a3_s0_mdnie_gallery_table[MODE_MAX][S6E3HA8_MDNIE_LEN] = {
+static unsigned char star_a3_s1_mdnie_gallery_table[MODE_MAX][S6E3HA8_MDNIE_LEN] = {
 	[DYNAMIC] = {
 		/* DFh */
 		0x11,	0x6a,	0x9a,	0x25,	0x1a,	0x16,	0x2a,	0x00,	0x37,	0x5a,	0x00,	0x4e,	0xc5,	0x00,	0x5d,	0x17,
@@ -481,7 +481,7 @@ static unsigned char star_a3_s0_mdnie_gallery_table[MODE_MAX][S6E3HA8_MDNIE_LEN]
 };
 
 /* ############################################# VT_MODE ############################################# */
-static unsigned char star_a3_s0_mdnie_vt_table[MODE_MAX][S6E3HA8_MDNIE_LEN] = {
+static unsigned char star_a3_s1_mdnie_vt_table[MODE_MAX][S6E3HA8_MDNIE_LEN] = {
 	[DYNAMIC] = {
 	},
 	[STANDARD] = {
@@ -495,7 +495,7 @@ static unsigned char star_a3_s0_mdnie_vt_table[MODE_MAX][S6E3HA8_MDNIE_LEN] = {
 };
 
 /* ############################################# BROWSER_MODE ############################################# */
-static unsigned char star_a3_s0_mdnie_browser_table[MODE_MAX][S6E3HA8_MDNIE_LEN] = {
+static unsigned char star_a3_s1_mdnie_browser_table[MODE_MAX][S6E3HA8_MDNIE_LEN] = {
 	[DYNAMIC] = {
 		/* DFh */
 		0x11,	0x6a,	0x9a,	0x25,	0x1a,	0x16,	0x2a,	0x00,	0x37,	0x5a,	0x00,	0x4e,	0xc5,	0x00,	0x5d,	0x17,
@@ -593,7 +593,7 @@ static unsigned char star_a3_s0_mdnie_browser_table[MODE_MAX][S6E3HA8_MDNIE_LEN]
 };
 
 /* ############################################# EBOOK_MODE ############################################# */
-static unsigned char star_a3_s0_mdnie_ebook_table[MODE_MAX][S6E3HA8_MDNIE_LEN] = {
+static unsigned char star_a3_s1_mdnie_ebook_table[MODE_MAX][S6E3HA8_MDNIE_LEN] = {
 	[DYNAMIC] = {
 		/* DFh */
 		0x11,	0x6a,	0x9a,	0x25,	0x1a,	0x16,	0x2a,	0x00,	0x37,	0x5a,	0x00,	0x4e,	0xc5,	0x00,	0x5d,	0x17,
@@ -692,7 +692,7 @@ static unsigned char star_a3_s0_mdnie_ebook_table[MODE_MAX][S6E3HA8_MDNIE_LEN] =
 
 /* ############################################# DMB_MODE ############################################# */
 #if 0 /*defined(CONFIG_TDMB)*/
-static unsigned char star_a3_s0_mdnie_dmb_table[MODE_MAX][S6E3HA8_MDNIE_LEN] = {
+static unsigned char star_a3_s1_mdnie_dmb_table[MODE_MAX][S6E3HA8_MDNIE_LEN] = {
 	[DYNAMIC] = {
 		/* DFh */
 		0x11,	0x6a,	0x9a,	0x25,	0x1a,	0x16,	0x2a,	0x00,	0x37,	0x5a,	0x00,	0x4e,	0xc5,	0x00,	0x5d,	0x17,
@@ -791,7 +791,7 @@ static unsigned char star_a3_s0_mdnie_dmb_table[MODE_MAX][S6E3HA8_MDNIE_LEN] = {
 #endif /* CONFIG_TDMB */
 
 /* ############################################# EMAIL_MODE ############################################# */
-static unsigned char star_a3_s0_mdnie_email_table[S6E3HA8_MDNIE_LEN] = {
+static unsigned char star_a3_s1_mdnie_email_table[S6E3HA8_MDNIE_LEN] = {
 	/* DFh */
 	0x01,	0x6a,	0x9a,	0x25,	0x1a,	0x16,	0x2a,	0x00,	0x37,	0x5a,	0x00,	0x4e,	0xc5,	0x00,	0x5d,	0x17,
 	0x00,	0x30,	0xc3,	0xff,	0x00,	0x00,	0xff,	0xff,	0x00,	0xff,	0x00,	0xff,	0xff,	0xff,	0xff,	0x00,
@@ -816,20 +816,20 @@ static unsigned char star_a3_s0_mdnie_email_table[S6E3HA8_MDNIE_LEN] = {
 };
 
 /* ############################################# GAME_LOW_MODE ############################################# */
-static unsigned char star_a3_s0_mdnie_game_low_table[S6E3HA8_MDNIE_LEN] = {
+static unsigned char star_a3_s1_mdnie_game_low_table[S6E3HA8_MDNIE_LEN] = {
 };
 
 /* ############################################# GAME_MID_MODE ############################################# */
-static unsigned char star_a3_s0_mdnie_game_mid_table[S6E3HA8_MDNIE_LEN] = {
+static unsigned char star_a3_s1_mdnie_game_mid_table[S6E3HA8_MDNIE_LEN] = {
 };
 
 /* ############################################# GAME_HIGH_MODE ############################################# */
-static unsigned char star_a3_s0_mdnie_game_high_table[S6E3HA8_MDNIE_LEN] = {
+static unsigned char star_a3_s1_mdnie_game_high_table[S6E3HA8_MDNIE_LEN] = {
 };
 
 
 /* ############################################# VIDEO_ENHANCER ############################################# */
-static unsigned char star_a3_s0_mdnie_video_enhancer_table[S6E3HA8_MDNIE_LEN] = {
+static unsigned char star_a3_s1_mdnie_video_enhancer_table[S6E3HA8_MDNIE_LEN] = {
 	/* DFh */
 	0x01,	0x67,	0xa9,	0x37,	0x29,	0x19,	0x47,	0x00,	0x25,	0x3d,	0x00,	0x31,	0xf4,	0x00,	0x51,	0xec,
 	0x00,	0x1c,	0xd8,	0xff,	0x5c,	0x68,	0xff,	0xe8,	0x00,	0xff,	0x00,	0xff,	0xff,	0xfd,	0xff,	0x00,
@@ -854,7 +854,7 @@ static unsigned char star_a3_s0_mdnie_video_enhancer_table[S6E3HA8_MDNIE_LEN] = 
 };
 
 /* ############################################# VIDEO_ENHANCER_THIRD ############################################# */
-static unsigned char star_a3_s0_mdnie_video_enhancer_third_table[S6E3HA8_MDNIE_LEN] = {
+static unsigned char star_a3_s1_mdnie_video_enhancer_third_table[S6E3HA8_MDNIE_LEN] = {
 	/* DFh */
 	0x01,	0x67,	0xa9,	0x37,	0x29,	0x19,	0x47,	0x00,	0x25,	0x3d,	0x00,	0x31,	0xf4,	0x00,	0x51,	0xec,
 	0x00,	0x1c,	0xd8,	0xff,	0x5c,	0x68,	0xff,	0xe8,	0x00,	0xff,	0x00,	0xff,	0xff,	0xfd,	0xff,	0x00,
@@ -879,11 +879,11 @@ static unsigned char star_a3_s0_mdnie_video_enhancer_third_table[S6E3HA8_MDNIE_L
 };
 
 /* ############################################# HMD_8_MODE ############################################# */
-static unsigned char star_a3_s0_mdnie_hmd_8_table[S6E3HA8_MDNIE_LEN] = {
+static unsigned char star_a3_s1_mdnie_hmd_8_table[S6E3HA8_MDNIE_LEN] = {
 };
 
 /* ############################################# HMD_16_MODE ############################################# */
-static unsigned char star_a3_s0_mdnie_hmd_16_table[S6E3HA8_MDNIE_LEN] = {
+static unsigned char star_a3_s1_mdnie_hmd_16_table[S6E3HA8_MDNIE_LEN] = {
 };
 
 /* #################################################################################################### */
@@ -891,7 +891,7 @@ static unsigned char star_a3_s0_mdnie_hmd_16_table[S6E3HA8_MDNIE_LEN] = {
 /* #################################################################################################### */
 
 /* ############################################# NEGATIVE ############################################# */
-static unsigned char star_a3_s0_mdnie_negative_table[S6E3HA8_MDNIE_LEN] = {
+static unsigned char star_a3_s1_mdnie_negative_table[S6E3HA8_MDNIE_LEN] = {
 	/* DFh */
 	0x01,	0x6a,	0x9a,	0x25,	0x1a,	0x16,	0x2a,	0x00,	0x37,	0x5a,	0x00,	0x4e,	0xc5,	0x00,	0x5d,	0x17,
 	0x00,	0x30,	0xc3,	0xff,	0x00,	0x00,	0xff,	0xff,	0x00,	0xff,	0x00,	0xff,	0x00,	0x00,	0x00,	0x00,
@@ -916,7 +916,7 @@ static unsigned char star_a3_s0_mdnie_negative_table[S6E3HA8_MDNIE_LEN] = {
 };
 
 /* ############################################# COLOR_BLIND ############################################# */
-static unsigned char star_a3_s0_mdnie_color_blind_table[S6E3HA8_MDNIE_LEN] = {
+static unsigned char star_a3_s1_mdnie_color_blind_table[S6E3HA8_MDNIE_LEN] = {
 	/* DFh */
 	0x00,	0x6a,	0x9a,	0x25,	0x1a,	0x16,	0x2a,	0x00,	0x37,	0x5a,	0x00,	0x4e,	0xc5,	0x00,	0x5d,	0x17,
 	0x00,	0x30,	0xc3,	0xff,	0x00,	0x00,	0xff,	0xff,	0x00,	0xff,	0x00,	0xff,	0xff,	0xff,	0xff,	0x00,
@@ -941,7 +941,7 @@ static unsigned char star_a3_s0_mdnie_color_blind_table[S6E3HA8_MDNIE_LEN] = {
 };
 
 /* ############################################# SCREEN_CURTAIN ############################################# */
-static unsigned char star_a3_s0_mdnie_screen_curtain_table[S6E3HA8_MDNIE_LEN] = {
+static unsigned char star_a3_s1_mdnie_screen_curtain_table[S6E3HA8_MDNIE_LEN] = {
 	/* DFh */
 	0x01,	0x6a,	0x9a,	0x25,	0x1a,	0x16,	0x2a,	0x00,	0x37,	0x5a,	0x00,	0x4e,	0xc5,	0x00,	0x5d,	0x17,
 	0x00,	0x30,	0xc3,	0x00,	0x00,	0x00,	0x00,	0x00,	0x00,	0x00,	0x00,	0x00,	0x00,	0x00,	0x00,	0x00,
@@ -966,7 +966,7 @@ static unsigned char star_a3_s0_mdnie_screen_curtain_table[S6E3HA8_MDNIE_LEN] = 
 };
 
 /* ############################################# GRAYSCALE ############################################# */
-static unsigned char star_a3_s0_mdnie_grayscale_table[S6E3HA8_MDNIE_LEN] = {
+static unsigned char star_a3_s1_mdnie_grayscale_table[S6E3HA8_MDNIE_LEN] = {
 	/* DFh */
 	0x01,	0x6a,	0x9a,	0x25,	0x1a,	0x16,	0x2a,	0x00,	0x37,	0x5a,	0x00,	0x4e,	0xc5,	0x00,	0x5d,	0x17,
 	0x00,	0x30,	0xc3,	0x4c,	0x4c,	0x4c,	0xe2,	0xe2,	0xe2,	0x69,	0x69,	0x69,	0xff,	0xff,	0xff,	0xb3,
@@ -991,7 +991,7 @@ static unsigned char star_a3_s0_mdnie_grayscale_table[S6E3HA8_MDNIE_LEN] = {
 };
 
 /* ############################################# GRAYSCALE_NEGATIVE ############################################# */
-static unsigned char star_a3_s0_mdnie_grayscale_negative_table[S6E3HA8_MDNIE_LEN] = {
+static unsigned char star_a3_s1_mdnie_grayscale_negative_table[S6E3HA8_MDNIE_LEN] = {
 	/* DFh */
 	0x01,	0x6a,	0x9a,	0x25,	0x1a,	0x16,	0x2a,	0x00,	0x37,	0x5a,	0x00,	0x4e,	0xc5,	0x00,	0x5d,	0x17,
 	0x00,	0x30,	0xc3,	0x4c,	0x4c,	0x4c,	0xe2,	0xe2,	0xe2,	0x69,	0x69,	0x69,	0x00,	0x00,	0x00,	0xb3,
@@ -1016,7 +1016,7 @@ static unsigned char star_a3_s0_mdnie_grayscale_negative_table[S6E3HA8_MDNIE_LEN
 };
 
 /* ############################################# COLOR_BLIND_HBM ############################################# */
-static unsigned char star_a3_s0_mdnie_color_blind_hbm_table[S6E3HA8_MDNIE_LEN] = {
+static unsigned char star_a3_s1_mdnie_color_blind_hbm_table[S6E3HA8_MDNIE_LEN] = {
 	/* DFh */
 	0x00,	0x6a,	0x9a,	0x25,	0x1a,	0x16,	0x2a,	0x00,	0x37,	0x5a,	0x00,	0x4e,	0xc5,	0x00,	0x5d,	0x17,
 	0x00,	0x30,	0xc3,	0xff,	0x00,	0x00,	0xff,	0xff,	0x00,	0xff,	0x00,	0xff,	0xff,	0xff,	0xff,	0x00,
@@ -1045,7 +1045,7 @@ static unsigned char star_a3_s0_mdnie_color_blind_hbm_table[S6E3HA8_MDNIE_LEN] =
 /* #################################################################################################### */
 
 /* ############################################## BYPASS ############################################## */
-static unsigned char star_a3_s0_mdnie_bypass_table[S6E3HA8_MDNIE_LEN] = {
+static unsigned char star_a3_s1_mdnie_bypass_table[S6E3HA8_MDNIE_LEN] = {
 	/* DFh */
 	0x00,	0x6a,	0x9a,	0x25,	0x1a,	0x16,	0x2a,	0x00,	0x37,	0x5a,	0x00,	0x4e,	0xc5,	0x00,	0x5d,	0x17,
 	0x00,	0x30,	0xc3,	0xff,	0x00,	0x00,	0xff,	0xff,	0x00,	0xff,	0x00,	0xff,	0xff,	0xff,	0xff,	0x00,
@@ -1072,7 +1072,7 @@ static unsigned char star_a3_s0_mdnie_bypass_table[S6E3HA8_MDNIE_LEN] = {
 /* #################################################################################################### */
 /* ############################################### HBM ################################################ */
 /* #################################################################################################### */
-static unsigned char star_a3_s0_mdnie_hbm_table[S6E3HA8_MDNIE_LEN] = {
+static unsigned char star_a3_s1_mdnie_hbm_table[S6E3HA8_MDNIE_LEN] = {
 	/* DFh */
 	0x01,	0x6a,	0x9a,	0x25,	0x1a,	0x16,	0x2a,	0x00,	0x37,	0x5a,	0x00,	0x4e,	0xc5,	0x00,	0x5d,	0x17,
 	0x00,	0x30,	0xc3,	0xff,	0x20,	0x20,	0xff,	0xff,	0x00,	0xff,	0x00,	0xff,	0xff,	0xff,	0xff,	0x00,
@@ -1100,7 +1100,7 @@ static unsigned char star_a3_s0_mdnie_hbm_table[S6E3HA8_MDNIE_LEN] = {
 /* ############################################### HMD ################################################ */
 /* #################################################################################################### */
 #ifdef CONFIG_SUPPORT_HMD
-static unsigned char star_a3_s0_mdnie_hmd_table[HMD_MDNIE_MAX][S6E3HA8_MDNIE_LEN] = {
+static unsigned char star_a3_s1_mdnie_hmd_table[HMD_MDNIE_MAX][S6E3HA8_MDNIE_LEN] = {
 	[HMD_3000K] = {
 		/* DFh */
 		0x00,	0x6a,	0x9a,	0x25,	0x1a,	0x16,	0x2a,	0x00,	0x37,	0x5a,	0x00,	0x4e,	0xc5,	0x00,	0x5d,	0x17,
@@ -1222,7 +1222,7 @@ static unsigned char star_a3_s0_mdnie_hmd_table[HMD_MDNIE_MAX][S6E3HA8_MDNIE_LEN
 /* #################################################################################################### */
 /* ############################################### HDR ################################################ */
 /* #################################################################################################### */
-static unsigned char star_a3_s0_mdnie_hdr_table[HDR_MAX][S6E3HA8_MDNIE_LEN] = {
+static unsigned char star_a3_s1_mdnie_hdr_table[HDR_MAX][S6E3HA8_MDNIE_LEN] = {
 	[HDR_1] = {
 		/* DFh */
 		0x11,	0x67,	0xa9,	0x37,	0x29,	0x19,	0x47,	0x00,	0x25,	0x3d,	0x00,	0x31,	0xf4,	0x00,	0x51,	0xec,
@@ -1297,7 +1297,7 @@ static unsigned char star_a3_s0_mdnie_hdr_table[HDR_MAX][S6E3HA8_MDNIE_LEN] = {
 /* #################################################################################################### */
 /* ############################################## NIGHT ############################################### */
 /* #################################################################################################### */
-static unsigned char star_a3_s0_mdnie_night_table[S6E3HA8_MDNIE_LEN] = {
+static unsigned char star_a3_s1_mdnie_night_table[S6E3HA8_MDNIE_LEN] = {
 	/* DFh */
 	0x00,	0x6a,	0x9a,	0x25,	0x1a,	0x16,	0x2a,	0x00,	0x37,	0x5a,	0x00,	0x4e,	0xc5,	0x00,	0x5d,	0x17,
 	0x00,	0x30,	0xc3,	0xff,	0x00,	0x00,	0xff,	0xff,	0x00,	0xff,	0x00,	0xff,	0xff,	0xff,	0xff,	0x00,
@@ -1324,7 +1324,7 @@ static unsigned char star_a3_s0_mdnie_night_table[S6E3HA8_MDNIE_LEN] = {
 /* #################################################################################################### */
 /* ############################################ COLOR_LENS ############################################ */
 /* #################################################################################################### */
-static unsigned char star_a3_s0_mdnie_color_lens_table[S6E3HA8_MDNIE_LEN] = {
+static unsigned char star_a3_s1_mdnie_color_lens_table[S6E3HA8_MDNIE_LEN] = {
 	/* DFh */
 	0x00,	0x6a,	0x9a,	0x25,	0x1a,	0x16,	0x2a,	0x00,	0x37,	0x5a,	0x00,	0x4e,	0xc5,	0x00,	0x5d,	0x17,
 	0x00,	0x30,	0xc3,	0xff,	0x00,	0x00,	0xff,	0xff,	0x00,	0xff,	0x00,	0xff,	0xff,	0xff,	0xff,	0x00,
@@ -1351,7 +1351,7 @@ static unsigned char star_a3_s0_mdnie_color_lens_table[S6E3HA8_MDNIE_LEN] = {
 /* #################################################################################################### */
 /* ####################################### LIGHT_NOTIFICATION ######################################### */
 /* #################################################################################################### */
-static unsigned char star_a3_s0_mdnie_light_notification_table[S6E3HA8_MDNIE_LEN] = {
+static unsigned char star_a3_s1_mdnie_light_notification_table[S6E3HA8_MDNIE_LEN] = {
 	/* DFh */
 	0x01,	0x6a,	0x9a,	0x25,	0x1a,	0x16,	0x2a,	0x00,	0x37,	0x5a,	0x00,	0x4e,	0xc5,	0x00,	0x5d,	0x17,
 	0x00,	0x30,	0xc3,	0xff,	0x60,	0x13,	0xff,	0xf9,	0x13,	0xff,	0x60,	0xac,	0xff,	0xf9,	0xac,	0x66,
@@ -1376,12 +1376,12 @@ static unsigned char star_a3_s0_mdnie_light_notification_table[S6E3HA8_MDNIE_LEN
 };
 
 /* color coordination order is WR, WG, WB */
-static unsigned char star_a3_s0_color_coordinate_table[][3] = {
+static unsigned char star_a3_s1_color_coordinate_table[][3] = {
 	{ 0xff, 0xff, 0xff },	/* adaptive default white rgb */
 	{ 0xff, 0xff, 0xff },	/* d65 default white rgb */
 };
 
-static unsigned char star_a3_s0_adjust_ldu_table[][MAX_LDU_MODE][3] = {
+static unsigned char star_a3_s1_adjust_ldu_table[][MAX_LDU_MODE][3] = {
 	{
 		/* adjust_ldu_data_1 */
 		{ 0xff, 0xff, 0xff }, /* LDU_MODE_OFF */
@@ -1402,11 +1402,11 @@ static unsigned char star_a3_s0_adjust_ldu_table[][MAX_LDU_MODE][3] = {
 	},
 };
 
-static unsigned char star_a3_s0_sensor_rgb_table[][3] = {
+static unsigned char star_a3_s1_sensor_rgb_table[][3] = {
 	{ 0xff, 0xff, 0xff },
 };
 
-static unsigned char star_a3_s0_night_mode_table[MAX_NIGHT_LEVEL][S6E3HA8_NIGHT_MODE_LEN] = {
+static unsigned char star_a3_s1_night_mode_table[MAX_NIGHT_LEVEL][S6E3HA8_NIGHT_MODE_LEN] = {
 	{ 0x00, 0xff, 0xf7, 0x00, 0xef, 0x00, 0xff, 0x00, 0x00, 0xf7, 0xef, 0x00, 0xff, 0x00, 0xf7, 0x00, 0x00, 0xef, 0xff, 0x00, 0xf7, 0x00, 0xef, 0x00 }, /* 6500K */
 	{ 0x00, 0xff, 0xf8, 0x00, 0xea, 0x00, 0xff, 0x00, 0x00, 0xf8, 0xea, 0x00, 0xff, 0x00, 0xf8, 0x00, 0x00, 0xea, 0xff, 0x00, 0xf8, 0x00, 0xea, 0x00 }, /* 6100K */
 	{ 0x00, 0xff, 0xf5, 0x00, 0xe2, 0x00, 0xff, 0x00, 0x00, 0xf5, 0xe2, 0x00, 0xff, 0x00, 0xf5, 0x00, 0x00, 0xe2, 0xff, 0x00, 0xf5, 0x00, 0xe2, 0x00 }, /* 5700K */
@@ -1420,7 +1420,7 @@ static unsigned char star_a3_s0_night_mode_table[MAX_NIGHT_LEVEL][S6E3HA8_NIGHT_
 	{ 0x00, 0xff, 0xc3, 0x00, 0x6a, 0x00, 0xff, 0x00, 0x00, 0xc3, 0x6a, 0x00, 0xff, 0x00, 0xc3, 0x00, 0x00, 0x6a, 0xff, 0x00, 0xc3, 0x00, 0x6a, 0x00 }  /* 2500K */
 };
 
-static unsigned char star_a3_s0_color_lens_table[COLOR_LENS_COLOR_MAX][COLOR_LENS_LEVEL_MAX][S6E3HA8_COLOR_LENS_LEN] = {
+static unsigned char star_a3_s1_color_lens_table[COLOR_LENS_COLOR_MAX][COLOR_LENS_LEVEL_MAX][S6E3HA8_COLOR_LENS_LEN] = {
 	//Blue
 	{
 		{ 0x00, 0xcc, 0xcc, 0x00, 0xff, 0x33, 0xcc, 0x00, 0x00, 0xcc, 0xff, 0x33, 0xcc, 0x00, 0xcc, 0x00, 0x33, 0xff, 0xcc, 0x00, 0xcc, 0x00, 0xff, 0x33 }, /* 20% */
@@ -1567,425 +1567,425 @@ static unsigned char star_a3_s0_color_lens_table[COLOR_LENS_COLOR_MAX][COLOR_LEN
 	}
 };
 
-static unsigned char star_a3_s0_trans_mode_table[][1] = {
+static unsigned char star_a3_s1_trans_mode_table[][1] = {
 	{ 0x00 },	/* TRANS_OFF */
 	{ 0xFF },	/* TRANS_ON - dummy */
 };
 
-static struct maptbl star_a3_s0_mdnie_etc_maptbl[] = {
+static struct maptbl star_a3_s1_mdnie_etc_maptbl[] = {
 	[MDNIE_ETC_TRANS_MAPTBL] =
-		DEFINE_2D_MAPTBL(star_a3_s0_trans_mode_table, init_common_table, getidx_mdnie_trans_mode_maptbl, copy_common_maptbl),
+		DEFINE_2D_MAPTBL(star_a3_s1_trans_mode_table, init_common_table, getidx_mdnie_trans_mode_maptbl, copy_common_maptbl),
 	[MDNIE_ETC_NIGHT_MAPTBL] =
-		DEFINE_2D_MAPTBL(star_a3_s0_night_mode_table, init_common_table, getidx_mdnie_night_mode_maptbl, copy_common_maptbl),
+		DEFINE_2D_MAPTBL(star_a3_s1_night_mode_table, init_common_table, getidx_mdnie_night_mode_maptbl, copy_common_maptbl),
 	[MDNIE_ETC_COLOR_LENS_MAPTBL] =
-		DEFINE_3D_MAPTBL(star_a3_s0_color_lens_table, init_mdnie_color_lens_table, getidx_color_lens_maptbl, copy_common_maptbl),
+		DEFINE_3D_MAPTBL(star_a3_s1_color_lens_table, init_mdnie_color_lens_table, getidx_color_lens_maptbl, copy_common_maptbl),
 };
 
-static struct maptbl star_a3_s0_mdnie_scr_white_maptbl[] = {
+static struct maptbl star_a3_s1_mdnie_scr_white_maptbl[] = {
 	[MDNIE_SCR_WHITE_NONE_MAPTBL] =
-		DEFINE_0D_MAPTBL(star_a3_s0_scr_white_none_table, init_common_table, NULL, update_current_scr_white),
+		DEFINE_0D_MAPTBL(star_a3_s1_scr_white_none_table, init_common_table, NULL, update_current_scr_white),
 	[MDNIE_COLOR_COORDINATE_MAPTBL] =
-		DEFINE_2D_MAPTBL(star_a3_s0_color_coordinate_table, init_color_coordinate_table, getidx_color_coordinate_maptbl, copy_color_coordinate_maptbl),
+		DEFINE_2D_MAPTBL(star_a3_s1_color_coordinate_table, init_color_coordinate_table, getidx_color_coordinate_maptbl, copy_color_coordinate_maptbl),
 	[MDNIE_ADJUST_LDU_MAPTBL] =
-		DEFINE_3D_MAPTBL(star_a3_s0_adjust_ldu_table, init_common_table, getidx_adjust_ldu_maptbl, copy_adjust_ldu_maptbl),
+		DEFINE_3D_MAPTBL(star_a3_s1_adjust_ldu_table, init_common_table, getidx_adjust_ldu_maptbl, copy_adjust_ldu_maptbl),
 	[MDNIE_SENSOR_RGB_MAPTBL] =
-		DEFINE_2D_MAPTBL(star_a3_s0_sensor_rgb_table, init_sensor_rgb_table, getidx_common_maptbl, copy_scr_white_maptbl),
+		DEFINE_2D_MAPTBL(star_a3_s1_sensor_rgb_table, init_sensor_rgb_table, getidx_common_maptbl, copy_scr_white_maptbl),
 };
 
-static struct maptbl star_a3_s0_mdnie_maptbl[MAX_MDNIE_MAPTBL][NR_S6E3HA8_MDNIE_REG] = {
+static struct maptbl star_a3_s1_mdnie_maptbl[MAX_MDNIE_MAPTBL][NR_S6E3HA8_MDNIE_REG] = {
 	/* SCENARIO */
 	[MDNIE_UI_MAPTBL] = {
-		DEFINE_MAPTBL("ui_0", (u8 *)star_a3_s0_mdnie_ui_table + S6E3HA8_MDNIE_0_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
+		DEFINE_MAPTBL("ui_0", (u8 *)star_a3_s1_mdnie_ui_table + S6E3HA8_MDNIE_0_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
 				init_common_table, getidx_mdnie_scenario_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("ui_1", (u8 *)star_a3_s0_mdnie_ui_table + S6E3HA8_MDNIE_1_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
+		DEFINE_MAPTBL("ui_1", (u8 *)star_a3_s1_mdnie_ui_table + S6E3HA8_MDNIE_1_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
 				init_common_table, getidx_mdnie_scenario_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("ui_2", (u8 *)star_a3_s0_mdnie_ui_table + S6E3HA8_MDNIE_2_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
+		DEFINE_MAPTBL("ui_2", (u8 *)star_a3_s1_mdnie_ui_table + S6E3HA8_MDNIE_2_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
 				init_common_table, getidx_mdnie_scenario_maptbl, copy_common_maptbl),
 	},
 
 	[MDNIE_VIDEO_MAPTBL] = {
-		DEFINE_MAPTBL("video_0", (u8 *)star_a3_s0_mdnie_video_table + S6E3HA8_MDNIE_0_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
+		DEFINE_MAPTBL("video_0", (u8 *)star_a3_s1_mdnie_video_table + S6E3HA8_MDNIE_0_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
 				init_common_table, getidx_mdnie_scenario_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("video_1", (u8 *)star_a3_s0_mdnie_video_table + S6E3HA8_MDNIE_1_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
+		DEFINE_MAPTBL("video_1", (u8 *)star_a3_s1_mdnie_video_table + S6E3HA8_MDNIE_1_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
 				init_common_table, getidx_mdnie_scenario_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("video_2", (u8 *)star_a3_s0_mdnie_video_table + S6E3HA8_MDNIE_2_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
+		DEFINE_MAPTBL("video_2", (u8 *)star_a3_s1_mdnie_video_table + S6E3HA8_MDNIE_2_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
 				init_common_table, getidx_mdnie_scenario_maptbl, copy_common_maptbl),
 	},
 
 	[MDNIE_CAMERA_MAPTBL] = {
-		DEFINE_MAPTBL("camera_0", (u8 *)star_a3_s0_mdnie_camera_table + S6E3HA8_MDNIE_0_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
+		DEFINE_MAPTBL("camera_0", (u8 *)star_a3_s1_mdnie_camera_table + S6E3HA8_MDNIE_0_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
 				init_common_table, getidx_mdnie_scenario_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("camera_1", (u8 *)star_a3_s0_mdnie_camera_table + S6E3HA8_MDNIE_1_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
+		DEFINE_MAPTBL("camera_1", (u8 *)star_a3_s1_mdnie_camera_table + S6E3HA8_MDNIE_1_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
 				init_common_table, getidx_mdnie_scenario_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("camera_2", (u8 *)star_a3_s0_mdnie_camera_table + S6E3HA8_MDNIE_2_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
+		DEFINE_MAPTBL("camera_2", (u8 *)star_a3_s1_mdnie_camera_table + S6E3HA8_MDNIE_2_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
 				init_common_table, getidx_mdnie_scenario_maptbl, copy_common_maptbl),
 	},
 
 	[MDNIE_GALLERY_MAPTBL] = {
-		DEFINE_MAPTBL("gallery_0", (u8 *)star_a3_s0_mdnie_gallery_table + S6E3HA8_MDNIE_0_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
+		DEFINE_MAPTBL("gallery_0", (u8 *)star_a3_s1_mdnie_gallery_table + S6E3HA8_MDNIE_0_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
 				init_common_table, getidx_mdnie_scenario_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("gallery_1", (u8 *)star_a3_s0_mdnie_gallery_table + S6E3HA8_MDNIE_1_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
+		DEFINE_MAPTBL("gallery_1", (u8 *)star_a3_s1_mdnie_gallery_table + S6E3HA8_MDNIE_1_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
 				init_common_table, getidx_mdnie_scenario_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("gallery_2", (u8 *)star_a3_s0_mdnie_gallery_table + S6E3HA8_MDNIE_2_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
+		DEFINE_MAPTBL("gallery_2", (u8 *)star_a3_s1_mdnie_gallery_table + S6E3HA8_MDNIE_2_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
 				init_common_table, getidx_mdnie_scenario_maptbl, copy_common_maptbl),
 	},
 
 	[MDNIE_VT_MAPTBL] = {
-		DEFINE_MAPTBL("vt_0", (u8 *)star_a3_s0_mdnie_vt_table + S6E3HA8_MDNIE_0_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
+		DEFINE_MAPTBL("vt_0", (u8 *)star_a3_s1_mdnie_vt_table + S6E3HA8_MDNIE_0_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
 				init_common_table, getidx_mdnie_scenario_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("vt_1", (u8 *)star_a3_s0_mdnie_vt_table + S6E3HA8_MDNIE_1_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
+		DEFINE_MAPTBL("vt_1", (u8 *)star_a3_s1_mdnie_vt_table + S6E3HA8_MDNIE_1_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
 				init_common_table, getidx_mdnie_scenario_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("vt_2", (u8 *)star_a3_s0_mdnie_vt_table + S6E3HA8_MDNIE_2_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
+		DEFINE_MAPTBL("vt_2", (u8 *)star_a3_s1_mdnie_vt_table + S6E3HA8_MDNIE_2_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
 				init_common_table, getidx_mdnie_scenario_maptbl, copy_common_maptbl),
 	},
 
 	[MDNIE_BROWSER_MAPTBL] = {
-		DEFINE_MAPTBL("browser_0", (u8 *)star_a3_s0_mdnie_browser_table + S6E3HA8_MDNIE_0_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
+		DEFINE_MAPTBL("browser_0", (u8 *)star_a3_s1_mdnie_browser_table + S6E3HA8_MDNIE_0_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
 				init_common_table, getidx_mdnie_scenario_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("browser_1", (u8 *)star_a3_s0_mdnie_browser_table + S6E3HA8_MDNIE_1_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
+		DEFINE_MAPTBL("browser_1", (u8 *)star_a3_s1_mdnie_browser_table + S6E3HA8_MDNIE_1_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
 				init_common_table, getidx_mdnie_scenario_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("browser_2", (u8 *)star_a3_s0_mdnie_browser_table + S6E3HA8_MDNIE_2_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
+		DEFINE_MAPTBL("browser_2", (u8 *)star_a3_s1_mdnie_browser_table + S6E3HA8_MDNIE_2_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
 				init_common_table, getidx_mdnie_scenario_maptbl, copy_common_maptbl),
 	},
 
 	[MDNIE_EBOOK_MAPTBL] = {
-		DEFINE_MAPTBL("ebook_0", (u8 *)star_a3_s0_mdnie_ebook_table + S6E3HA8_MDNIE_0_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
+		DEFINE_MAPTBL("ebook_0", (u8 *)star_a3_s1_mdnie_ebook_table + S6E3HA8_MDNIE_0_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
 				init_common_table, getidx_mdnie_scenario_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("ebook_1", (u8 *)star_a3_s0_mdnie_ebook_table + S6E3HA8_MDNIE_1_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
+		DEFINE_MAPTBL("ebook_1", (u8 *)star_a3_s1_mdnie_ebook_table + S6E3HA8_MDNIE_1_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
 				init_common_table, getidx_mdnie_scenario_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("ebook_2", (u8 *)star_a3_s0_mdnie_ebook_table + S6E3HA8_MDNIE_2_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
+		DEFINE_MAPTBL("ebook_2", (u8 *)star_a3_s1_mdnie_ebook_table + S6E3HA8_MDNIE_2_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
 				init_common_table, getidx_mdnie_scenario_maptbl, copy_common_maptbl),
 	},
 
 	[MDNIE_EMAIL_MAPTBL] = {
-		DEFINE_MAPTBL("email_0", (u8 *)star_a3_s0_mdnie_email_table + S6E3HA8_MDNIE_0_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
+		DEFINE_MAPTBL("email_0", (u8 *)star_a3_s1_mdnie_email_table + S6E3HA8_MDNIE_0_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
 				init_common_table, getidx_common_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("email_1", (u8 *)star_a3_s0_mdnie_email_table + S6E3HA8_MDNIE_1_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
+		DEFINE_MAPTBL("email_1", (u8 *)star_a3_s1_mdnie_email_table + S6E3HA8_MDNIE_1_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
 				init_common_table, getidx_common_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("email_2", (u8 *)star_a3_s0_mdnie_email_table + S6E3HA8_MDNIE_2_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
+		DEFINE_MAPTBL("email_2", (u8 *)star_a3_s1_mdnie_email_table + S6E3HA8_MDNIE_2_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
 				init_common_table, getidx_common_maptbl, copy_common_maptbl),
 	},
 
 	[MDNIE_GAME_LOW_MAPTBL] = {
-		DEFINE_MAPTBL("game_low_0", (u8 *)star_a3_s0_mdnie_game_low_table + S6E3HA8_MDNIE_0_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
+		DEFINE_MAPTBL("game_low_0", (u8 *)star_a3_s1_mdnie_game_low_table + S6E3HA8_MDNIE_0_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
 				init_common_table, getidx_common_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("game_low_1", (u8 *)star_a3_s0_mdnie_game_low_table + S6E3HA8_MDNIE_1_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
+		DEFINE_MAPTBL("game_low_1", (u8 *)star_a3_s1_mdnie_game_low_table + S6E3HA8_MDNIE_1_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
 				init_common_table, getidx_common_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("game_low_2", (u8 *)star_a3_s0_mdnie_game_low_table + S6E3HA8_MDNIE_2_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
+		DEFINE_MAPTBL("game_low_2", (u8 *)star_a3_s1_mdnie_game_low_table + S6E3HA8_MDNIE_2_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
 				init_common_table, getidx_common_maptbl, copy_common_maptbl),
 	},
 
 	[MDNIE_GAME_MID_MAPTBL] = {
-		DEFINE_MAPTBL("game_mid_0", (u8 *)star_a3_s0_mdnie_game_mid_table + S6E3HA8_MDNIE_0_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
+		DEFINE_MAPTBL("game_mid_0", (u8 *)star_a3_s1_mdnie_game_mid_table + S6E3HA8_MDNIE_0_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
 				init_common_table, getidx_common_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("game_mid_1", (u8 *)star_a3_s0_mdnie_game_mid_table + S6E3HA8_MDNIE_1_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
+		DEFINE_MAPTBL("game_mid_1", (u8 *)star_a3_s1_mdnie_game_mid_table + S6E3HA8_MDNIE_1_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
 				init_common_table, getidx_common_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("game_mid_2", (u8 *)star_a3_s0_mdnie_game_mid_table + S6E3HA8_MDNIE_2_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
+		DEFINE_MAPTBL("game_mid_2", (u8 *)star_a3_s1_mdnie_game_mid_table + S6E3HA8_MDNIE_2_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
 				init_common_table, getidx_common_maptbl, copy_common_maptbl),
 	},
 
 	[MDNIE_GAME_HIGH_MAPTBL] = {
-		DEFINE_MAPTBL("game_high_0", (u8 *)star_a3_s0_mdnie_game_high_table + S6E3HA8_MDNIE_0_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
+		DEFINE_MAPTBL("game_high_0", (u8 *)star_a3_s1_mdnie_game_high_table + S6E3HA8_MDNIE_0_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
 				init_common_table, getidx_common_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("game_high_1", (u8 *)star_a3_s0_mdnie_game_high_table + S6E3HA8_MDNIE_1_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
+		DEFINE_MAPTBL("game_high_1", (u8 *)star_a3_s1_mdnie_game_high_table + S6E3HA8_MDNIE_1_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
 				init_common_table, getidx_common_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("game_high_2", (u8 *)star_a3_s0_mdnie_game_high_table + S6E3HA8_MDNIE_2_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
+		DEFINE_MAPTBL("game_high_2", (u8 *)star_a3_s1_mdnie_game_high_table + S6E3HA8_MDNIE_2_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
 				init_common_table, getidx_common_maptbl, copy_common_maptbl),
 	},
 
 	[MDNIE_VIDEO_ENHANCER_MAPTBL] = {
-		DEFINE_MAPTBL("video_enhancer_0", (u8 *)star_a3_s0_mdnie_video_enhancer_table + S6E3HA8_MDNIE_0_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
+		DEFINE_MAPTBL("video_enhancer_0", (u8 *)star_a3_s1_mdnie_video_enhancer_table + S6E3HA8_MDNIE_0_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
 				init_common_table, getidx_common_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("video_enhancer_1", (u8 *)star_a3_s0_mdnie_video_enhancer_table + S6E3HA8_MDNIE_1_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
+		DEFINE_MAPTBL("video_enhancer_1", (u8 *)star_a3_s1_mdnie_video_enhancer_table + S6E3HA8_MDNIE_1_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
 				init_common_table, getidx_common_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("video_enhancer_2", (u8 *)star_a3_s0_mdnie_video_enhancer_table + S6E3HA8_MDNIE_2_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
+		DEFINE_MAPTBL("video_enhancer_2", (u8 *)star_a3_s1_mdnie_video_enhancer_table + S6E3HA8_MDNIE_2_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
 				init_common_table, getidx_common_maptbl, copy_common_maptbl),
 	},
 
 	[MDNIE_VIDEO_ENHANCER_THIRD_MAPTBL] = {
-		DEFINE_MAPTBL("video_enhancer_third_0", (u8 *)star_a3_s0_mdnie_video_enhancer_third_table + S6E3HA8_MDNIE_0_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
+		DEFINE_MAPTBL("video_enhancer_third_0", (u8 *)star_a3_s1_mdnie_video_enhancer_third_table + S6E3HA8_MDNIE_0_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
 				init_common_table, getidx_common_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("video_enhancer_third_1", (u8 *)star_a3_s0_mdnie_video_enhancer_third_table + S6E3HA8_MDNIE_1_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
+		DEFINE_MAPTBL("video_enhancer_third_1", (u8 *)star_a3_s1_mdnie_video_enhancer_third_table + S6E3HA8_MDNIE_1_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
 				init_common_table, getidx_common_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("video_enhancer_third_2", (u8 *)star_a3_s0_mdnie_video_enhancer_third_table + S6E3HA8_MDNIE_2_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
+		DEFINE_MAPTBL("video_enhancer_third_2", (u8 *)star_a3_s1_mdnie_video_enhancer_third_table + S6E3HA8_MDNIE_2_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
 				init_common_table, getidx_common_maptbl, copy_common_maptbl),
 	},
 
 	[MDNIE_HMD_8_MAPTBL] = {
-		DEFINE_MAPTBL("hmd_8_0", (u8 *)star_a3_s0_mdnie_hmd_8_table + S6E3HA8_MDNIE_0_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
+		DEFINE_MAPTBL("hmd_8_0", (u8 *)star_a3_s1_mdnie_hmd_8_table + S6E3HA8_MDNIE_0_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
 				init_common_table, getidx_common_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("hmd_8_1", (u8 *)star_a3_s0_mdnie_hmd_8_table + S6E3HA8_MDNIE_1_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
+		DEFINE_MAPTBL("hmd_8_1", (u8 *)star_a3_s1_mdnie_hmd_8_table + S6E3HA8_MDNIE_1_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
 				init_common_table, getidx_common_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("hmd_8_2", (u8 *)star_a3_s0_mdnie_hmd_8_table + S6E3HA8_MDNIE_2_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
+		DEFINE_MAPTBL("hmd_8_2", (u8 *)star_a3_s1_mdnie_hmd_8_table + S6E3HA8_MDNIE_2_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
 				init_common_table, getidx_common_maptbl, copy_common_maptbl),
 	},
 
 	[MDNIE_HMD_16_MAPTBL] = {
-		DEFINE_MAPTBL("hmd_16_0", (u8 *)star_a3_s0_mdnie_hmd_16_table + S6E3HA8_MDNIE_0_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
+		DEFINE_MAPTBL("hmd_16_0", (u8 *)star_a3_s1_mdnie_hmd_16_table + S6E3HA8_MDNIE_0_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
 				init_common_table, getidx_common_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("hmd_16_1", (u8 *)star_a3_s0_mdnie_hmd_16_table + S6E3HA8_MDNIE_1_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
+		DEFINE_MAPTBL("hmd_16_1", (u8 *)star_a3_s1_mdnie_hmd_16_table + S6E3HA8_MDNIE_1_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
 				init_common_table, getidx_common_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("hmd_16_2", (u8 *)star_a3_s0_mdnie_hmd_16_table + S6E3HA8_MDNIE_2_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
+		DEFINE_MAPTBL("hmd_16_2", (u8 *)star_a3_s1_mdnie_hmd_16_table + S6E3HA8_MDNIE_2_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
 				init_common_table, getidx_common_maptbl, copy_common_maptbl),
 	},
 	/* ACCESSIBILITY */
 	[MDNIE_NEGATIVE_MAPTBL] = {
-		DEFINE_MAPTBL("negative_0", (u8 *)star_a3_s0_mdnie_negative_table + S6E3HA8_MDNIE_0_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
+		DEFINE_MAPTBL("negative_0", (u8 *)star_a3_s1_mdnie_negative_table + S6E3HA8_MDNIE_0_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
 				init_common_table, getidx_common_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("negative_1", (u8 *)star_a3_s0_mdnie_negative_table + S6E3HA8_MDNIE_1_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
+		DEFINE_MAPTBL("negative_1", (u8 *)star_a3_s1_mdnie_negative_table + S6E3HA8_MDNIE_1_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
 				init_common_table, getidx_common_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("negative_2", (u8 *)star_a3_s0_mdnie_negative_table + S6E3HA8_MDNIE_2_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
+		DEFINE_MAPTBL("negative_2", (u8 *)star_a3_s1_mdnie_negative_table + S6E3HA8_MDNIE_2_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
 				init_common_table, getidx_common_maptbl, copy_common_maptbl),
 	},
 
 	[MDNIE_COLOR_BLIND_MAPTBL] = {
-		DEFINE_MAPTBL("color_blind_0", (u8 *)star_a3_s0_mdnie_color_blind_table + S6E3HA8_MDNIE_0_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
+		DEFINE_MAPTBL("color_blind_0", (u8 *)star_a3_s1_mdnie_color_blind_table + S6E3HA8_MDNIE_0_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
 				init_color_blind_table, getidx_common_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("color_blind_1", (u8 *)star_a3_s0_mdnie_color_blind_table + S6E3HA8_MDNIE_1_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
+		DEFINE_MAPTBL("color_blind_1", (u8 *)star_a3_s1_mdnie_color_blind_table + S6E3HA8_MDNIE_1_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
 				init_color_blind_table, getidx_common_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("color_blind_2", (u8 *)star_a3_s0_mdnie_color_blind_table + S6E3HA8_MDNIE_2_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
+		DEFINE_MAPTBL("color_blind_2", (u8 *)star_a3_s1_mdnie_color_blind_table + S6E3HA8_MDNIE_2_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
 				init_color_blind_table, getidx_common_maptbl, copy_common_maptbl),
 	},
 
 	[MDNIE_SCREEN_CURTAIN_MAPTBL] = {
-		DEFINE_MAPTBL("screen_curtain_0", (u8 *)star_a3_s0_mdnie_screen_curtain_table + S6E3HA8_MDNIE_0_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
+		DEFINE_MAPTBL("screen_curtain_0", (u8 *)star_a3_s1_mdnie_screen_curtain_table + S6E3HA8_MDNIE_0_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
 				init_common_table, getidx_common_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("screen_curtain_1", (u8 *)star_a3_s0_mdnie_screen_curtain_table + S6E3HA8_MDNIE_1_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
+		DEFINE_MAPTBL("screen_curtain_1", (u8 *)star_a3_s1_mdnie_screen_curtain_table + S6E3HA8_MDNIE_1_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
 				init_common_table, getidx_common_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("screen_curtain_2", (u8 *)star_a3_s0_mdnie_screen_curtain_table + S6E3HA8_MDNIE_2_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
+		DEFINE_MAPTBL("screen_curtain_2", (u8 *)star_a3_s1_mdnie_screen_curtain_table + S6E3HA8_MDNIE_2_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
 				init_common_table, getidx_common_maptbl, copy_common_maptbl),
 	},
 
 	[MDNIE_GRAYSCALE_MAPTBL] = {
-		DEFINE_MAPTBL("grayscale_0", (u8 *)star_a3_s0_mdnie_grayscale_table + S6E3HA8_MDNIE_0_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
+		DEFINE_MAPTBL("grayscale_0", (u8 *)star_a3_s1_mdnie_grayscale_table + S6E3HA8_MDNIE_0_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
 				init_common_table, getidx_common_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("grayscale_1", (u8 *)star_a3_s0_mdnie_grayscale_table + S6E3HA8_MDNIE_1_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
+		DEFINE_MAPTBL("grayscale_1", (u8 *)star_a3_s1_mdnie_grayscale_table + S6E3HA8_MDNIE_1_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
 				init_common_table, getidx_common_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("grayscale_2", (u8 *)star_a3_s0_mdnie_grayscale_table + S6E3HA8_MDNIE_2_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
+		DEFINE_MAPTBL("grayscale_2", (u8 *)star_a3_s1_mdnie_grayscale_table + S6E3HA8_MDNIE_2_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
 				init_common_table, getidx_common_maptbl, copy_common_maptbl),
 	},
 
 	[MDNIE_GRAYSCALE_NEGATIVE_MAPTBL] = {
-		DEFINE_MAPTBL("grayscale_negative_0", (u8 *)star_a3_s0_mdnie_grayscale_negative_table + S6E3HA8_MDNIE_0_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
+		DEFINE_MAPTBL("grayscale_negative_0", (u8 *)star_a3_s1_mdnie_grayscale_negative_table + S6E3HA8_MDNIE_0_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
 				init_common_table, getidx_common_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("grayscale_negative_1", (u8 *)star_a3_s0_mdnie_grayscale_negative_table + S6E3HA8_MDNIE_1_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
+		DEFINE_MAPTBL("grayscale_negative_1", (u8 *)star_a3_s1_mdnie_grayscale_negative_table + S6E3HA8_MDNIE_1_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
 				init_common_table, getidx_common_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("grayscale_negative_2", (u8 *)star_a3_s0_mdnie_grayscale_negative_table + S6E3HA8_MDNIE_2_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
+		DEFINE_MAPTBL("grayscale_negative_2", (u8 *)star_a3_s1_mdnie_grayscale_negative_table + S6E3HA8_MDNIE_2_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
 				init_common_table, getidx_common_maptbl, copy_common_maptbl),
 	},
 
 	[MDNIE_COLOR_BLIND_HBM_MAPTBL] = {
-		DEFINE_MAPTBL("color_blind_hbm_0", (u8 *)star_a3_s0_mdnie_color_blind_hbm_table + S6E3HA8_MDNIE_0_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
+		DEFINE_MAPTBL("color_blind_hbm_0", (u8 *)star_a3_s1_mdnie_color_blind_hbm_table + S6E3HA8_MDNIE_0_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
 				init_color_blind_table, getidx_common_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("color_blind_hbm_1", (u8 *)star_a3_s0_mdnie_color_blind_hbm_table + S6E3HA8_MDNIE_1_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
+		DEFINE_MAPTBL("color_blind_hbm_1", (u8 *)star_a3_s1_mdnie_color_blind_hbm_table + S6E3HA8_MDNIE_1_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
 				init_color_blind_table, getidx_common_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("color_blind_hbm_2", (u8 *)star_a3_s0_mdnie_color_blind_hbm_table + S6E3HA8_MDNIE_2_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
+		DEFINE_MAPTBL("color_blind_hbm_2", (u8 *)star_a3_s1_mdnie_color_blind_hbm_table + S6E3HA8_MDNIE_2_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
 				init_color_blind_table, getidx_common_maptbl, copy_common_maptbl),
 	},
 	/* BYPASS */
 	[MDNIE_BYPASS_MAPTBL] = {
-		DEFINE_MAPTBL("bypass_0", (u8 *)star_a3_s0_mdnie_bypass_table + S6E3HA8_MDNIE_0_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
+		DEFINE_MAPTBL("bypass_0", (u8 *)star_a3_s1_mdnie_bypass_table + S6E3HA8_MDNIE_0_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
 				init_common_table, getidx_common_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("bypass_1", (u8 *)star_a3_s0_mdnie_bypass_table + S6E3HA8_MDNIE_1_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
+		DEFINE_MAPTBL("bypass_1", (u8 *)star_a3_s1_mdnie_bypass_table + S6E3HA8_MDNIE_1_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
 				init_common_table, getidx_common_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("bypass_2", (u8 *)star_a3_s0_mdnie_bypass_table + S6E3HA8_MDNIE_2_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
+		DEFINE_MAPTBL("bypass_2", (u8 *)star_a3_s1_mdnie_bypass_table + S6E3HA8_MDNIE_2_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
 				init_common_table, getidx_common_maptbl, copy_common_maptbl),
 	},
 
 	/* HBM */
 	[MDNIE_HBM_MAPTBL] = {
-		DEFINE_MAPTBL("hbm_0", (u8 *)star_a3_s0_mdnie_hbm_table + S6E3HA8_MDNIE_0_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
+		DEFINE_MAPTBL("hbm_0", (u8 *)star_a3_s1_mdnie_hbm_table + S6E3HA8_MDNIE_0_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
 				init_common_table, getidx_common_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("hbm_1", (u8 *)star_a3_s0_mdnie_hbm_table + S6E3HA8_MDNIE_1_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
+		DEFINE_MAPTBL("hbm_1", (u8 *)star_a3_s1_mdnie_hbm_table + S6E3HA8_MDNIE_1_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
 				init_common_table, getidx_common_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("hbm_2", (u8 *)star_a3_s0_mdnie_hbm_table + S6E3HA8_MDNIE_2_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
+		DEFINE_MAPTBL("hbm_2", (u8 *)star_a3_s1_mdnie_hbm_table + S6E3HA8_MDNIE_2_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
 				init_common_table, getidx_common_maptbl, copy_common_maptbl),
 	},
 
 #ifdef CONFIG_SUPPORT_HMD
 	/* HMD */
 	[MDNIE_HMD_MAPTBL] = {
-		DEFINE_MAPTBL("hmd_0", (u8 *)star_a3_s0_mdnie_hmd_table + S6E3HA8_MDNIE_0_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
+		DEFINE_MAPTBL("hmd_0", (u8 *)star_a3_s1_mdnie_hmd_table + S6E3HA8_MDNIE_0_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
 				init_common_table, getidx_mdnie_hmd_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("hmd_1", (u8 *)star_a3_s0_mdnie_hmd_table + S6E3HA8_MDNIE_1_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
+		DEFINE_MAPTBL("hmd_1", (u8 *)star_a3_s1_mdnie_hmd_table + S6E3HA8_MDNIE_1_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
 				init_common_table, getidx_mdnie_hmd_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("hmd_2", (u8 *)star_a3_s0_mdnie_hmd_table + S6E3HA8_MDNIE_2_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
+		DEFINE_MAPTBL("hmd_2", (u8 *)star_a3_s1_mdnie_hmd_table + S6E3HA8_MDNIE_2_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
 				init_common_table, getidx_mdnie_hmd_maptbl, copy_common_maptbl),
 	},
 #endif
 
 	/* HDR */
 	[MDNIE_HDR_MAPTBL] = {
-		DEFINE_MAPTBL("hdr_0", (u8 *)star_a3_s0_mdnie_hdr_table + S6E3HA8_MDNIE_0_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
+		DEFINE_MAPTBL("hdr_0", (u8 *)star_a3_s1_mdnie_hdr_table + S6E3HA8_MDNIE_0_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
 				init_common_table, getidx_mdnie_hdr_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("hdr_1", (u8 *)star_a3_s0_mdnie_hdr_table + S6E3HA8_MDNIE_1_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
+		DEFINE_MAPTBL("hdr_1", (u8 *)star_a3_s1_mdnie_hdr_table + S6E3HA8_MDNIE_1_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
 				init_common_table, getidx_mdnie_hdr_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("hdr_2", (u8 *)star_a3_s0_mdnie_hdr_table + S6E3HA8_MDNIE_2_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
+		DEFINE_MAPTBL("hdr_2", (u8 *)star_a3_s1_mdnie_hdr_table + S6E3HA8_MDNIE_2_OFS, 1, MODE_MAX, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
 				init_common_table, getidx_mdnie_hdr_maptbl, copy_common_maptbl),
 	},
 
 	/* NIGHT */
 	[MDNIE_NIGHT_MAPTBL] = {
-		DEFINE_MAPTBL("night_0", (u8 *)star_a3_s0_mdnie_night_table + S6E3HA8_MDNIE_0_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
+		DEFINE_MAPTBL("night_0", (u8 *)star_a3_s1_mdnie_night_table + S6E3HA8_MDNIE_0_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
 				init_mdnie_night_mode_table, getidx_common_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("night_1", (u8 *)star_a3_s0_mdnie_night_table + S6E3HA8_MDNIE_1_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
+		DEFINE_MAPTBL("night_1", (u8 *)star_a3_s1_mdnie_night_table + S6E3HA8_MDNIE_1_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
 				init_common_table, getidx_common_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("night_2", (u8 *)star_a3_s0_mdnie_night_table + S6E3HA8_MDNIE_2_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
+		DEFINE_MAPTBL("night_2", (u8 *)star_a3_s1_mdnie_night_table + S6E3HA8_MDNIE_2_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
 				init_common_table, getidx_common_maptbl, copy_common_maptbl),
 	},
 
 	/* LIGHT_NOTIFICATION */
 	[MDNIE_LIGHT_NOTIFICATION_MAPTBL] = {
-		DEFINE_MAPTBL("light_notification_0", (u8 *)star_a3_s0_mdnie_light_notification_table + S6E3HA8_MDNIE_0_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
+		DEFINE_MAPTBL("light_notification_0", (u8 *)star_a3_s1_mdnie_light_notification_table + S6E3HA8_MDNIE_0_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
 				init_common_table, getidx_common_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("light_notification_1", (u8 *)star_a3_s0_mdnie_light_notification_table + S6E3HA8_MDNIE_1_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
+		DEFINE_MAPTBL("light_notification_1", (u8 *)star_a3_s1_mdnie_light_notification_table + S6E3HA8_MDNIE_1_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
 				init_common_table, getidx_common_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("light_notification_2", (u8 *)star_a3_s0_mdnie_light_notification_table + S6E3HA8_MDNIE_2_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
+		DEFINE_MAPTBL("light_notification_2", (u8 *)star_a3_s1_mdnie_light_notification_table + S6E3HA8_MDNIE_2_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
 				init_common_table, getidx_common_maptbl, copy_common_maptbl),
 	},
 
 	/* COLOR_LENS */
 	[MDNIE_COLOR_LENS_MAPTBL] = {
-		DEFINE_MAPTBL("color_lens_0", (u8 *)star_a3_s0_mdnie_color_lens_table + S6E3HA8_MDNIE_0_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
+		DEFINE_MAPTBL("color_lens_0", (u8 *)star_a3_s1_mdnie_color_lens_table + S6E3HA8_MDNIE_0_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_0_LEN,
 				init_mdnie_color_lens_table, getidx_common_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("color_lens_1", (u8 *)star_a3_s0_mdnie_color_lens_table + S6E3HA8_MDNIE_1_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
+		DEFINE_MAPTBL("color_lens_1", (u8 *)star_a3_s1_mdnie_color_lens_table + S6E3HA8_MDNIE_1_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_1_LEN,
 				init_common_table, getidx_common_maptbl, copy_common_maptbl),
-		DEFINE_MAPTBL("color_lens_2", (u8 *)star_a3_s0_mdnie_color_lens_table + S6E3HA8_MDNIE_2_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
+		DEFINE_MAPTBL("color_lens_2", (u8 *)star_a3_s1_mdnie_color_lens_table + S6E3HA8_MDNIE_2_OFS, 1, 1, S6E3HA8_MDNIE_LEN, S6E3HA8_MDNIE_2_LEN,
 				init_common_table, getidx_common_maptbl, copy_common_maptbl),
 	},
 };
 
-static u8 STAR_A3_S0_MDNIE_0[S6E3HA8_MDNIE_0_LEN + 1] = { S6E3HA8_MDNIE_0_REG, 0x00, };
-static u8 STAR_A3_S0_MDNIE_1[S6E3HA8_MDNIE_1_LEN + 1] = { S6E3HA8_MDNIE_1_REG, 0x00, };
-static u8 STAR_A3_S0_MDNIE_2[S6E3HA8_MDNIE_2_LEN + 1] = { S6E3HA8_MDNIE_2_REG, 0x00, };
+static u8 STAR_A3_S1_MDNIE_0[S6E3HA8_MDNIE_0_LEN + 1] = { S6E3HA8_MDNIE_0_REG, 0x00, };
+static u8 STAR_A3_S1_MDNIE_1[S6E3HA8_MDNIE_1_LEN + 1] = { S6E3HA8_MDNIE_1_REG, 0x00, };
+static u8 STAR_A3_S1_MDNIE_2[S6E3HA8_MDNIE_2_LEN + 1] = { S6E3HA8_MDNIE_2_REG, 0x00, };
 
-static DECLARE_PKTUI(star_a3_s0_mdnie_0) = {
+static DECLARE_PKTUI(star_a3_s1_mdnie_0) = {
 	{
 		.offset = S6E3HA8_DATA_OFS,
-		.maptbl = (struct maptbl *)star_a3_s0_mdnie_maptbl,
-		.nr_maptbl = (sizeof(star_a3_s0_mdnie_maptbl) / sizeof(struct maptbl)),
+		.maptbl = (struct maptbl *)star_a3_s1_mdnie_maptbl,
+		.nr_maptbl = (sizeof(star_a3_s1_mdnie_maptbl) / sizeof(struct maptbl)),
 		.getidx = getidx_mdnie_0_maptbl,
 	},
 	{
 		.offset = S6E3HA8_DATA_OFS + S6E3HA8_SCR_WR_OFS,
-		.maptbl = star_a3_s0_mdnie_scr_white_maptbl,
-		.nr_maptbl = ARRAY_SIZE(star_a3_s0_mdnie_scr_white_maptbl),
+		.maptbl = star_a3_s1_mdnie_scr_white_maptbl,
+		.nr_maptbl = ARRAY_SIZE(star_a3_s1_mdnie_scr_white_maptbl),
 		.getidx = getidx_mdnie_scr_white_maptbl,
 	},
 };
 
-static DECLARE_PKTUI(star_a3_s0_mdnie_1) = {
+static DECLARE_PKTUI(star_a3_s1_mdnie_1) = {
 	{
 		.offset = S6E3HA8_DATA_OFS,
-		.maptbl = (struct maptbl *)star_a3_s0_mdnie_maptbl,
-		.nr_maptbl = (sizeof(star_a3_s0_mdnie_maptbl) / sizeof(struct maptbl)),
+		.maptbl = (struct maptbl *)star_a3_s1_mdnie_maptbl,
+		.nr_maptbl = (sizeof(star_a3_s1_mdnie_maptbl) / sizeof(struct maptbl)),
 		.getidx = getidx_mdnie_1_maptbl
 	},
 };
 
-static DECLARE_PKTUI(star_a3_s0_mdnie_2) = {
+static DECLARE_PKTUI(star_a3_s1_mdnie_2) = {
 	{
 		.offset = S6E3HA8_DATA_OFS,
-		.maptbl = (struct maptbl *)star_a3_s0_mdnie_maptbl,
-		.nr_maptbl = (sizeof(star_a3_s0_mdnie_maptbl) / sizeof(struct maptbl)),
+		.maptbl = (struct maptbl *)star_a3_s1_mdnie_maptbl,
+		.nr_maptbl = (sizeof(star_a3_s1_mdnie_maptbl) / sizeof(struct maptbl)),
 		.getidx = getidx_mdnie_2_maptbl
 	},
 	{
 		.offset = S6E3HA8_DATA_OFS + S6E3HA8_TRANS_MODE_OFS,
-		.maptbl = (struct maptbl *)star_a3_s0_mdnie_etc_maptbl,
-		.nr_maptbl = (sizeof(star_a3_s0_mdnie_etc_maptbl) / sizeof(struct maptbl)),
+		.maptbl = (struct maptbl *)star_a3_s1_mdnie_etc_maptbl,
+		.nr_maptbl = (sizeof(star_a3_s1_mdnie_etc_maptbl) / sizeof(struct maptbl)),
 		.getidx = getidx_trans_maptbl,
 	},
 };
 
-static DEFINE_VARIABLE_PACKET(star_a3_s0_mdnie_0, DSI_PKT_TYPE_WR, STAR_A3_S0_MDNIE_0, 0);
-static DEFINE_VARIABLE_PACKET(star_a3_s0_mdnie_1, DSI_PKT_TYPE_WR, STAR_A3_S0_MDNIE_1, 0);
-static DEFINE_VARIABLE_PACKET(star_a3_s0_mdnie_2, DSI_PKT_TYPE_WR, STAR_A3_S0_MDNIE_2, 0);
+static DEFINE_VARIABLE_PACKET(star_a3_s1_mdnie_0, DSI_PKT_TYPE_WR, STAR_A3_S1_MDNIE_0, 0);
+static DEFINE_VARIABLE_PACKET(star_a3_s1_mdnie_1, DSI_PKT_TYPE_WR, STAR_A3_S1_MDNIE_1, 0);
+static DEFINE_VARIABLE_PACKET(star_a3_s1_mdnie_2, DSI_PKT_TYPE_WR, STAR_A3_S1_MDNIE_2, 0);
 
 #ifdef CONFIG_SUPPORT_AFC
-static u8 STAR_A3_S0_AFC_OFF[] = { S6E3HA8_AFC_REG, 0x00 };
-static u8 STAR_A3_S0_AFC_ON[S6E3HA8_AFC_LEN + 1] = {
+static u8 STAR_A3_S1_AFC_OFF[] = { S6E3HA8_AFC_REG, 0x00 };
+static u8 STAR_A3_S1_AFC_ON[S6E3HA8_AFC_LEN + 1] = {
 	S6E3HA8_AFC_REG,
 	0x01, 0x00, 0x03, 0x0F, 0x00, 0x00, 0x00, 0x00, 0x05, 0x9F, 0x00, 0x5F, 0x00, 0x00, 0x0A, 0xD0,
 	0x05, 0x9F, 0x0B, 0x8F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0x53, 0x00, 0xA7, 0x01, 0x00,
 	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
 };
 
-static struct maptbl star_a3_s0_afc_maptbl[] = {
-	[AFC_ON_MAPTBL] = DEFINE_0D_MAPTBL(star_a3_s0_afc_table, init_common_table, NULL, copy_afc_maptbl),
+static struct maptbl star_a3_s1_afc_maptbl[] = {
+	[AFC_ON_MAPTBL] = DEFINE_0D_MAPTBL(star_a3_s1_afc_table, init_common_table, NULL, copy_afc_maptbl),
 };
-static DEFINE_STATIC_PACKET(star_a3_s0_afc_off, DSI_PKT_TYPE_WR, STAR_A3_S0_AFC_OFF, 0);
-static DEFINE_PKTUI(star_a3_s0_afc_on, &star_a3_s0_afc_maptbl[AFC_ON_MAPTBL],
+static DEFINE_STATIC_PACKET(star_a3_s1_afc_off, DSI_PKT_TYPE_WR, STAR_A3_S1_AFC_OFF, 0);
+static DEFINE_PKTUI(star_a3_s1_afc_on, &star_a3_s1_afc_maptbl[AFC_ON_MAPTBL],
 		S6E3HA8_DATA_OFS + S6E3HA8_AFC_ROI_OFS);
-static DEFINE_VARIABLE_PACKET(star_a3_s0_afc_on, DSI_PKT_TYPE_WR, STAR_A3_S0_AFC_ON, 0);
+static DEFINE_VARIABLE_PACKET(star_a3_s1_afc_on, DSI_PKT_TYPE_WR, STAR_A3_S1_AFC_ON, 0);
 #endif
 
-static struct keyinfo KEYINFO(star_a3_s0_level2_key_enable);
-static struct keyinfo KEYINFO(star_a3_s0_level2_key_disable);
+static struct keyinfo KEYINFO(star_a3_s1_level2_key_enable);
+static struct keyinfo KEYINFO(star_a3_s1_level2_key_disable);
 
-static void *star_a3_s0_mdnie_cmdtbl[] = {
-	&KEYINFO(star_a3_s0_level2_key_enable),
-	&PKTINFO(star_a3_s0_mdnie_0),
-	&PKTINFO(star_a3_s0_mdnie_1),
-	&PKTINFO(star_a3_s0_mdnie_2),
-	&KEYINFO(star_a3_s0_level2_key_disable),
+static void *star_a3_s1_mdnie_cmdtbl[] = {
+	&KEYINFO(star_a3_s1_level2_key_enable),
+	&PKTINFO(star_a3_s1_mdnie_0),
+	&PKTINFO(star_a3_s1_mdnie_1),
+	&PKTINFO(star_a3_s1_mdnie_2),
+	&KEYINFO(star_a3_s1_level2_key_disable),
 };
 
 #ifdef CONFIG_SUPPORT_AFC
-static void *star_a3_s0_afc_off_cmdtbl[] = {
-	&KEYINFO(star_a3_s0_level2_key_enable),
-	&PKTINFO(star_a3_s0_afc_off),
-	&KEYINFO(star_a3_s0_level2_key_disable),
+static void *star_a3_s1_afc_off_cmdtbl[] = {
+	&KEYINFO(star_a3_s1_level2_key_enable),
+	&PKTINFO(star_a3_s1_afc_off),
+	&KEYINFO(star_a3_s1_level2_key_disable),
 };
 
-static void *star_a3_s0_afc_on_cmdtbl[] = {
-	&KEYINFO(star_a3_s0_level2_key_enable),
-	&PKTINFO(star_a3_s0_afc_on),
-	&KEYINFO(star_a3_s0_level2_key_disable),
+static void *star_a3_s1_afc_on_cmdtbl[] = {
+	&KEYINFO(star_a3_s1_level2_key_enable),
+	&PKTINFO(star_a3_s1_afc_on),
+	&KEYINFO(star_a3_s1_level2_key_disable),
 };
 #endif
 
-static struct seqinfo star_a3_s0_mdnie_seqtbl[MAX_MDNIE_SEQ] = {
-	[MDNIE_SET_SEQ] = SEQINFO_INIT("set-mdnie-seq", star_a3_s0_mdnie_cmdtbl),
+static struct seqinfo star_a3_s1_mdnie_seqtbl[MAX_MDNIE_SEQ] = {
+	[MDNIE_SET_SEQ] = SEQINFO_INIT("set-mdnie-seq", star_a3_s1_mdnie_cmdtbl),
 #ifdef CONFIG_SUPPORT_AFC
-	[MDNIE_AFC_OFF_SEQ] = SEQINFO_INIT("afc-off-seq", star_a3_s0_afc_off_cmdtbl),
-	[MDNIE_AFC_ON_SEQ] = SEQINFO_INIT("afc-on-seq", star_a3_s0_afc_on_cmdtbl),
+	[MDNIE_AFC_OFF_SEQ] = SEQINFO_INIT("afc-off-seq", star_a3_s1_afc_off_cmdtbl),
+	[MDNIE_AFC_ON_SEQ] = SEQINFO_INIT("afc-on-seq", star_a3_s1_afc_on_cmdtbl),
 #endif
 };
 
-static struct mdnie_tune s6e3ha8_star_a3_s0_mdnie_tune = {
-	.seqtbl = star_a3_s0_mdnie_seqtbl,
-	.nr_seqtbl = ARRAY_SIZE(star_a3_s0_mdnie_seqtbl),
-	.maptbl = (struct maptbl *)star_a3_s0_mdnie_maptbl,
-	.nr_maptbl = (sizeof(star_a3_s0_mdnie_maptbl) / sizeof(struct maptbl)),
-	.scr_white_maptbl = (struct maptbl *)star_a3_s0_mdnie_scr_white_maptbl,
-	.nr_scr_white_maptbl = (sizeof(star_a3_s0_mdnie_scr_white_maptbl) / sizeof(struct maptbl)),
-	.etc_maptbl = (struct maptbl *)star_a3_s0_mdnie_etc_maptbl,
-	.nr_etc_maptbl = (sizeof(star_a3_s0_mdnie_etc_maptbl) / sizeof(struct maptbl)),
+static struct mdnie_tune s6e3ha8_star_a3_s1_mdnie_tune = {
+	.seqtbl = star_a3_s1_mdnie_seqtbl,
+	.nr_seqtbl = ARRAY_SIZE(star_a3_s1_mdnie_seqtbl),
+	.maptbl = (struct maptbl *)star_a3_s1_mdnie_maptbl,
+	.nr_maptbl = (sizeof(star_a3_s1_mdnie_maptbl) / sizeof(struct maptbl)),
+	.scr_white_maptbl = (struct maptbl *)star_a3_s1_mdnie_scr_white_maptbl,
+	.nr_scr_white_maptbl = (sizeof(star_a3_s1_mdnie_scr_white_maptbl) / sizeof(struct maptbl)),
+	.etc_maptbl = (struct maptbl *)star_a3_s1_mdnie_etc_maptbl,
+	.nr_etc_maptbl = (sizeof(star_a3_s1_mdnie_etc_maptbl) / sizeof(struct maptbl)),
 #ifdef CONFIG_SUPPORT_AFC
-	.afc_maptbl = (struct maptbl *)star_a3_s0_afc_maptbl,
-	.nr_afc_maptbl = (sizeof(star_a3_s0_afc_maptbl) / sizeof(struct maptbl)),
+	.afc_maptbl = (struct maptbl *)star_a3_s1_afc_maptbl,
+	.nr_afc_maptbl = (sizeof(star_a3_s1_afc_maptbl) / sizeof(struct maptbl)),
 #endif
 	.line = {
-		{ .num = S6E3HA8_STAR_A3_S0_LINE_0_NUM, .den = S6E3HA8_STAR_A3_S0_LINE_0_DEN, .con = S6E3HA8_STAR_A3_S0_LINE_0_CON },
-		{ .num = S6E3HA8_STAR_A3_S0_LINE_1_NUM, .den = S6E3HA8_STAR_A3_S0_LINE_1_DEN, .con = S6E3HA8_STAR_A3_S0_LINE_1_CON },
+		{ .num = S6E3HA8_STAR_A3_S1_LINE_0_NUM, .den = S6E3HA8_STAR_A3_S1_LINE_0_DEN, .con = S6E3HA8_STAR_A3_S1_LINE_0_CON },
+		{ .num = S6E3HA8_STAR_A3_S1_LINE_1_NUM, .den = S6E3HA8_STAR_A3_S1_LINE_1_DEN, .con = S6E3HA8_STAR_A3_S1_LINE_1_CON },
 	},
 	.coef = {
 		{
-			.a = S6E3HA8_STAR_A3_S0_COEFF_Q1_A, .b = S6E3HA8_STAR_A3_S0_COEFF_Q1_B, .c = S6E3HA8_STAR_A3_S0_COEFF_Q1_C, .d = S6E3HA8_STAR_A3_S0_COEFF_Q1_D,
-			.e = S6E3HA8_STAR_A3_S0_COEFF_Q1_E, .f = S6E3HA8_STAR_A3_S0_COEFF_Q1_F, .g = S6E3HA8_STAR_A3_S0_COEFF_Q1_G, .h = S6E3HA8_STAR_A3_S0_COEFF_Q1_H,
+			.a = S6E3HA8_STAR_A3_S1_COEFF_Q1_A, .b = S6E3HA8_STAR_A3_S1_COEFF_Q1_B, .c = S6E3HA8_STAR_A3_S1_COEFF_Q1_C, .d = S6E3HA8_STAR_A3_S1_COEFF_Q1_D,
+			.e = S6E3HA8_STAR_A3_S1_COEFF_Q1_E, .f = S6E3HA8_STAR_A3_S1_COEFF_Q1_F, .g = S6E3HA8_STAR_A3_S1_COEFF_Q1_G, .h = S6E3HA8_STAR_A3_S1_COEFF_Q1_H,
 		},
 		{
-			.a = S6E3HA8_STAR_A3_S0_COEFF_Q2_A, .b = S6E3HA8_STAR_A3_S0_COEFF_Q2_B, .c = S6E3HA8_STAR_A3_S0_COEFF_Q2_C, .d = S6E3HA8_STAR_A3_S0_COEFF_Q2_D,
-			.e = S6E3HA8_STAR_A3_S0_COEFF_Q2_E, .f = S6E3HA8_STAR_A3_S0_COEFF_Q2_F, .g = S6E3HA8_STAR_A3_S0_COEFF_Q2_G, .h = S6E3HA8_STAR_A3_S0_COEFF_Q2_H,
+			.a = S6E3HA8_STAR_A3_S1_COEFF_Q2_A, .b = S6E3HA8_STAR_A3_S1_COEFF_Q2_B, .c = S6E3HA8_STAR_A3_S1_COEFF_Q2_C, .d = S6E3HA8_STAR_A3_S1_COEFF_Q2_D,
+			.e = S6E3HA8_STAR_A3_S1_COEFF_Q2_E, .f = S6E3HA8_STAR_A3_S1_COEFF_Q2_F, .g = S6E3HA8_STAR_A3_S1_COEFF_Q2_G, .h = S6E3HA8_STAR_A3_S1_COEFF_Q2_H,
 		},
 		{
-			.a = S6E3HA8_STAR_A3_S0_COEFF_Q3_A, .b = S6E3HA8_STAR_A3_S0_COEFF_Q3_B, .c = S6E3HA8_STAR_A3_S0_COEFF_Q3_C, .d = S6E3HA8_STAR_A3_S0_COEFF_Q3_D,
-			.e = S6E3HA8_STAR_A3_S0_COEFF_Q3_E, .f = S6E3HA8_STAR_A3_S0_COEFF_Q3_F, .g = S6E3HA8_STAR_A3_S0_COEFF_Q3_G, .h = S6E3HA8_STAR_A3_S0_COEFF_Q3_H,
+			.a = S6E3HA8_STAR_A3_S1_COEFF_Q3_A, .b = S6E3HA8_STAR_A3_S1_COEFF_Q3_B, .c = S6E3HA8_STAR_A3_S1_COEFF_Q3_C, .d = S6E3HA8_STAR_A3_S1_COEFF_Q3_D,
+			.e = S6E3HA8_STAR_A3_S1_COEFF_Q3_E, .f = S6E3HA8_STAR_A3_S1_COEFF_Q3_F, .g = S6E3HA8_STAR_A3_S1_COEFF_Q3_G, .h = S6E3HA8_STAR_A3_S1_COEFF_Q3_H,
 		},
 		{
-			.a = S6E3HA8_STAR_A3_S0_COEFF_Q4_A, .b = S6E3HA8_STAR_A3_S0_COEFF_Q4_B, .c = S6E3HA8_STAR_A3_S0_COEFF_Q4_C, .d = S6E3HA8_STAR_A3_S0_COEFF_Q4_D,
-			.e = S6E3HA8_STAR_A3_S0_COEFF_Q4_E, .f = S6E3HA8_STAR_A3_S0_COEFF_Q4_F, .g = S6E3HA8_STAR_A3_S0_COEFF_Q4_G, .h = S6E3HA8_STAR_A3_S0_COEFF_Q4_H,
+			.a = S6E3HA8_STAR_A3_S1_COEFF_Q4_A, .b = S6E3HA8_STAR_A3_S1_COEFF_Q4_B, .c = S6E3HA8_STAR_A3_S1_COEFF_Q4_C, .d = S6E3HA8_STAR_A3_S1_COEFF_Q4_D,
+			.e = S6E3HA8_STAR_A3_S1_COEFF_Q4_E, .f = S6E3HA8_STAR_A3_S1_COEFF_Q4_F, .g = S6E3HA8_STAR_A3_S1_COEFF_Q4_G, .h = S6E3HA8_STAR_A3_S1_COEFF_Q4_H,
 		},
 	},
 	.cal_x_center = 2983,
@@ -2022,4 +2022,4 @@ static struct mdnie_tune s6e3ha8_star_a3_s0_mdnie_tune = {
 	.num_color_lens_color = 11,
 	.num_color_lens_level = 8,
 };
-#endif /* __S6E3HA8_STAR_A3_S0_PANEL_MDNIE_H__ */
+#endif /* __S6E3HA8_STAR_A3_S1_PANEL_MDNIE_H__ */
